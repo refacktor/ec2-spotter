@@ -1,0 +1,225 @@
+Here are the original instructions from http://www.bluegecko.net/amazon-web-services/ec2-persistent-boots-with-pivot-root/
+
+These instructions no longer work (as of August/2015)
+=====================================================
+
+To build a BusyBox AMI and an instance backed by EBS, simply follow these directions:
+
+1. Start an instance from an AMI that is running the desired kernel and software configuration. (You can use an existing public AMI or a custom AMI that you created. Personally, I prefer to create my own AMI’s, so I know what is in them.)
+
+2. Log into the instance.
+
+3. Download the latest version of BusyBox.
+
+wget “http://busybox.net/downloads/busybox-1.15.3.tar.bz2″
+
+4. Create a busyroot directory.
+
+mkdir busyroot
+
+5. Extract BusyBox.
+
+bunzip2 busybox-1.15.3.tar.bz2
+tar xvf busybox-1.15.3.tar
+
+6. Configure BusyBox. (You can experiment here to reduce the image size, but the configuration listed below works.)
+
+cd busybox-1.15.3
+make config
+Select “y” for the STATIC option and the default values for everything else.
+Build BusyBox as a static binary (no shared libs) (STATIC) [N/y/?] y
+
+7. Make and install BusyBox.
+
+make CONFIG_PREFIX=$HOME/busyroot install
+chmod 4755 $HOME/busyroot/bin/busybox
+
+8. Create required directories.
+
+cd $HOME/busyroot
+mkdir dev sys etc proc mnt mnt/new-root
+
+9. Create the necessary devices. (We will use /dev/sdj for the EBS volume, but this could be any block device not used by the normal AMI.)
+
+MAKEDEV -d $HOME/busyroot/dev -x sdj
+MAKEDEV -d $HOME/busyroot/dev -x console
+MAKEDEV -d $HOME/busyroot/dev -x null
+MAKEDEV -d $HOME/busyroot/dev -x zero
+
+10. Create the init file.
+
+mv $HOME/busyroot/sbin/init $HOME/busyroot/sbin/init.orig
+cat <<’EOL’ > $HOME/busyroot/sbin/init
+#!/bin/busybox sh
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+NEWDEV=”/dev/sdj”
+NEWTYP=”ext3″
+NEWMNT=”/mnt/new-root”
+OLDMNT=”/mnt/old-root”
+OPTIONS=”noatime,ro”
+SLEEP=10
+
+echo “Remounting writable.”
+mount -o remount,rw /
+[ ! -d $NEWMNT ] && echo “Creating directory $NEWMNT.” && mkdir -p $NEWMNT
+
+while true ; do
+echo “sleeping…”
+sleep $SLEEP
+echo “Trying to mount $NEWDEV writable.”
+mount -t $NEWTYP -o rw $NEWDEV $NEWMNT || continue
+echo “Mounted.”
+break;
+done
+
+[ ! -d $NEWMNT/$OLDMNT ] && echo “Creating directory $NEWMNT/$OLDMNT.” && mkdir -p $NEWMNT/$OLDMNT
+
+echo “Remounting $NEWMNT $OPTIONS.”
+mount -o remount,$OPTIONS $NEWMNT
+
+echo “Trying to pivot.”
+cd $NEWMNT
+pivot_root . ./$OLDMNT
+
+for dir in /dev /proc /sys; do
+echo “Moving mounted file system ${OLDMNT}${dir} to $dir.”
+mount –move ./${OLDMNT}${dir} ${dir}
+done
+
+echo “Trying to chroot.”
+exec chroot . /bin/sh -c “umount ./$OLDMNT; exec /sbin/init $*” < /dev/console > /dev/console 2>&1
+EOL
+
+chmod 755 $HOME/busyroot/sbin/init
+
+11. Create the fstab file.
+
+cat <<’EOL’ > $HOME/busyroot/etc/fstab
+/dev/sda1 / ext3 defaults 1 1
+none /dev/pts devpts gid=5,mode=620 0 0
+none /proc proc defaults 0 0
+none /sys sysfs defaults 0 0
+EOL
+
+12. Create a 4MB loopback file.
+
+cd
+dd if=/dev/zero of=busybox.fs bs=1M count=4
+mkfs.ext3 busybox.fs
+
+13. Mount the loopback file.
+
+mkdir $HOME/busyimg
+mount -o loop $HOME/busybox.fs $HOME/busyimg
+
+14. Copy the staged files and directories to the image. (Technically, the BusyBox image could have been built directly in $HOME/busyimg, but we were not sure how big the image was going to be.)
+
+cp -rp $HOME/busyroot/* $HOME/busyimg
+
+15. Un-mount the image.
+
+sync
+umount -d $HOME/busyimg
+
+16. Set environment variables.
+
+export EC2_HOME=/opt/ec2-api-tools
+export EC2_CERT=/path/to/your/cert.pem
+export EC2_PRIVATE_KEY=/path/to/your/pk.pem
+export AWS_ACCOUNT_NUMBER=”NNNN-NNNN-NNNN”
+export AWS_ACCESS_KEY_ID=your_key
+export AWS_SECRET_ACCESS_KEY=your_secret_key
+export EC2_BUCKET=”your_bucket”
+export JAVA_HOME=/usr/java/default
+export ARCH=`uname -i`
+export AKI=`curl -s http://169.254.169.254/latest/meta-data/kernel-id`
+export ARI=`curl -s http://169.254.169.254/latest/meta-data/ramdisk-id`
+export INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
+export AVAIL_ZONE=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
+export SEC_GROUP=`curl -s http://169.254.169.254/latest/meta-data/security-groups`
+export PUB_KEY=`wget -q -O – “http://169.254.169.254/latest/meta-data/public-keys” | awk -F= ‘{print $2}’`
+
+17. Bundle the image.
+
+ec2-bundle-image -i $HOME/busybox.fs -d /tmp -k $EC2_PRIVATE_KEY -c $EC2_CERT -u $AWS_ACCOUNT_NUMBER -r $ARCH –kernel $AKI –ramdisk $ARI
+
+18. Upload the image.
+
+ec2-upload-bundle -b $EC2_BUCKET -m /tmp/busybox.fs.manifest.xml -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY
+
+19. Register the AMI.
+
+BUSYBOX_AMI=`ec2-register “$EC2_BUCKET/busybox.fs.manifest.xml” | awk ‘{print $2}’`
+echo “BUSYBOX_AMI: $BUSYBOX_AMI”
+
+20. Create an EBS volume of the desired size (10G or more) in the desired availability zone.
+
+VOLUME_ID=`ec2-create-volume -s 10 -z $AVAIL_ZONE | awk ‘{print $2}’`
+echo “VOLUME_ID: $VOLUME_ID”
+
+21. Attach the volume to the current instance as /dev/sdj.
+
+ec2-attach-volume $VOLUME_ID -i $INSTANCE_ID -d /dev/sdj
+
+22. Create an EXT3 file system on /dev/sdj.
+
+mkfs.ext3 /dev/sdj
+
+22. Mount the EBS volume.
+
+mkdir /mnt/ebs_boot
+mount /dev/sdj /mnt/ebs_boot
+
+23. Copy the current AMI to the EBS volume.
+
+rsync -avHx / /mnt/ebs_boot
+
+24. Fix the /etc/fstab file.
+
+vi /mnt/ebs_boot/etc/fstab
+Remove the local file systems.
+/dev/sda1 / ext3 defaults 1 1
+/dev/sdb /mnt ext3 defaults 1 2
+/dev/sda3 swap swap defaults 0 0
+Add the /dev/sdj file system.
+/dev/sdj / ext3 defaults 1 1
+
+25. Fix the /etc/inittab file. The cloud AMI’s are normally configured for runlevel 4.
+
+vi /mnt/ebs_boot/etc/inittab
+Edit the following line if necessary:
+id:4:initdefault:
+
+26. Un-mount the EBS volume.
+
+sync
+umount /mnt/ebs_boot
+
+27. Detach the volume.
+
+ec2-detach-volume $VOLUME_ID -i $INSTANCE_ID -d /dev/sdj
+
+28. Create a new instance running the BusyBox AMI.
+
+BUSYBOX_ID=`ec2-run-instances $BUSYBOX_AMI -z $AVAIL_ZONE -k $PUB_KEY -g $SEC_GROUP | awk ‘{print $6}’`
+
+29. Wait until the instance is running…
+
+ec2-describe-instances $BUSYBOX_ID
+
+30. Attach the EBS volume to the BusyBox instance as /dev/sdj.
+
+ec2-attach-volume $VOLUME_ID -i $BUSYBOX_ID -d /dev/sdj
+
+31. Reboot the BusyBox instance to make sure it picks up the new device.
+
+ec2-reboot-instances $BUSYBOX_ID
+
+32. Check the BusyBox instance’s console output to make sure it came up as expected.
+
+ec2-get-console-output $BUSYBOX_ID
+
+33. Log into the new EBS backed instance.
+
+That should be it. You now have a persistent instance that is backed by EBS storage!
+
