@@ -1,5 +1,10 @@
-apt-get install -y make gcc
+apt-get update -y
+apt-get install -y make gcc ruby unzip
 
 wget https://ec2-downloads.s3.amazonaws.com/ec2-api-tools.zip
 
+wget http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
+
 wget http://www.busybox.net/downloads/busybox-1.23.2.tar.bz2
+
+

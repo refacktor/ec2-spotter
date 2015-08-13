@@ -19,8 +19,8 @@ export APIBIN=./ec2-api-tools-*/bin
 
 #export JAVA_HOME=/usr/java/default
 export ARCH=`uname -i`
-export AKI=`curl -s http://169.254.169.254/latest/meta-data/kernel-id`
-export ARI=`curl -s http://169.254.169.254/latest/meta-data/ramdisk-id`
+export AKI=/vmlinuz
+export ARI=/initrd.img
 export INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
 export AVAIL_ZONE=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
 export SEC_GROUP=`curl -s http://169.254.169.254/latest/meta-data/security-groups`
