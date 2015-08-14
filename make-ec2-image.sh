@@ -37,7 +37,7 @@ $AMIBIN/ec2-upload-bundle -b $EC2_BUCKET -m /tmp/busybox.fs.manifest.xml -a $AWS
 
 #19. Register the AMI.
 
-BUSYBOX_AMI=`$AMIBIN/ec2-register "$EC2_BUCKET/busybox.fs.manifest.xml"  | awk '{print $2}'`
+BUSYBOX_AMI=`$APIBIN/ec2-register "$EC2_BUCKET/busybox.fs.manifest.xml"  | awk '{print $2}'`
 echo "BUSYBOX_AMI: $BUSYBOX_AMI"
 
 #20. Create an EBS volume of the desired size (10G or more) in the desired availability zone.
