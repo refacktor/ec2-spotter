@@ -11,6 +11,9 @@ mkdir $BUILD
 cd busybox-*/ || exit -1
 make -s defconfig
 
+# Make the build static
+sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/' .config
+
 # Make and install BusyBox
 make -s CONFIG_PREFIX=$BUILD/busyroot install
 chmod 4755 $BUILD/busyroot/bin/busybox
@@ -31,7 +34,6 @@ mkdir dev sys etc proc mnt mnt/new-root
 # Create the init file.
 mv $BUILD/busyroot/sbin/init $BUILD/busyroot/sbin/init.orig
 cat <<'EOL' > $BUILD/busyroot/sbin/init
-
 #!/bin/busybox sh
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 NEWDEV="/dev/sdj"
