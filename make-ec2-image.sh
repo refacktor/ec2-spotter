@@ -9,8 +9,8 @@ export EC2_CERT=/path/to/your/cert.pem
 export EC2_PRIVATE_KEY=/path/to/your/pk.pem
 export EC2_BUCKET="your_bucket"
 export AWS_ACCOUNT_NUMBER="NNNN-NNNN-NNNN"
-export AWS_ACCESS_KEY_ID=your_key
-export AWS_SECRET_ACCESS_KEY=your_secret_key
+export AWS_ACCESS_KEY=your_key
+export AWS_SECRET_KEY=your_secret_key
 # override defaults with secret values
 . /root/.aws-secrets
 
