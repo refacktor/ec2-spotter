@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 export AWS_CREDENTIAL_FILE=/root/.aws.creds
 
 export AMIBIN=./ec2-ami-tools-*/bin
@@ -32,7 +32,7 @@ SOURCE_VOLUME=$(${APIBIN}/ec2-describe-tags --region ${SOURCE_REGION} --filter "
 PIVOT_VOLUME=${SOURCE_VOLUME}
 
 # Are we copying the volume from the same region?
-if [[ "$SOURCE_REGION" != "$DEST_REGION" ]]; then
+if [[ $SOURCE_REGION != $DEST_REGION ]]; then
     # need to copy the volume across
     echo "Volume $SOURCE_VOLUME is in another region"
     echo "Creating a snapshot of the volume"
