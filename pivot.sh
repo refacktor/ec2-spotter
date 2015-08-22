@@ -20,7 +20,9 @@ TAG_VALUE="ubuntu"
 # Check S3 to see if we have updated configuration settings
 # By default, we expect a bucket called ec2-spotter-config, and a config file to override the above 3 settings
 # called ec2-spotter.ini
-if aws s3 --region $DEST_REGION cp s3://ec2-spotter-config/ec2-spotter.ini  . ; then
+# NOTE: us-east-1 is the only endpoint for S3 that has no location constraint
+# See here: http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+if aws s3 --endpoint us-east-1 cp s3://ec2-spotter-config/ec2-spotter.ini  . ; then
     . ec2-spotter.ini
 fi
 
