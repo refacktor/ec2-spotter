@@ -36,7 +36,7 @@ if [[ $SOURCE_REGION != $DEST_REGION ]]; then
     # need to copy the volume across
     echo "Volume $SOURCE_VOLUME is in another region"
     echo "Creating a snapshot of the volume"
-    SNAPSHOT=$(${APIBIN}/ec2-create-snapshot --region ${SOURCE_REGION} $SOURCE_VOLUME)
+    SNAPSHOT=$(${APIBIN}/ec2-create-snapshot --region ${SOURCE_REGION} $SOURCE_VOLUME | awk '{print $2}')
     
     echo "Snapshot $SNAPSHOT created. Waiting for completion"
     # Keep checking to see that snapshot has been created
@@ -55,7 +55,7 @@ if [[ $SOURCE_REGION != $DEST_REGION ]]; then
     echo ""
     
     # Copy the snapshot
-    NEW_SNAPSHOT=$(${APIBIN}/ec2-copy-snapshot -r ${SOURCE_REGION} ${SNAPSHOT} | awk '{print $2}')
+    NEW_SNAPSHOT=$(${APIBIN}/ec2-copy-snapshot -r ${SOURCE_REGION} -s ${SNAPSHOT} | awk '{print $2}')
     
     echo "Copying snapshot from $SOURCE_REGION to $DEST_REGION with name $NEW_SNAPSHOT. Waiting for completion"
     
@@ -76,7 +76,7 @@ if [[ $SOURCE_REGION != $DEST_REGION ]]; then
     echo ""
 
     # create volume from this new snapshot
-    $NEW_VOLUME=$(${APIBIN}/ec2-create-volume --snapshot ${NEW_SNAPSHOT} -z ${AVAIL_ZONE} | awk '{print $2}')
+    NEW_VOLUME=$(${APIBIN}/ec2-create-volume --snapshot ${NEW_SNAPSHOT} -z ${AVAIL_ZONE} | awk '{print $2}')
     echo "Creating volume $NEW_VOLUME from $NEW_SNAPSHOT. Waiting for completion"
     
     # Keep checking to see that volume has been created
