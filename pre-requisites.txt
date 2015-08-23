@@ -7,6 +7,10 @@ yes | add-apt-repository ppa:webupd8team/java
 apt-get update
 apt-get -y install oracle-java8-installer
 
+# new AWS API
+apt-get install -y python-pip
+pip install awscli
+
 # Bundled in git clone
 # wget https://ec2-downloads.s3.amazonaws.com/ec2-api-tools.zip
 # wget http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
