@@ -6,7 +6,7 @@ export APIBIN=./ec2-api-tools-*/bin
 
 export EC2_HOME=$(ls -d ./ec2-api-tools-*)
 
-export JAVA_HOME=/usr/lib/jvm/default-java
+export JAVA_HOME=$(echo /usr/lib/jvm/*)
 export ARCH=`uname -i`
 
 export INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
@@ -15,16 +15,16 @@ export DEST_REGION=${AVAIL_ZONE::-1} # Get the region by stripping the last char
 
 SOURCE_REGION=$DEST_REGION # By default, we're in the same region
 TAG_KEY="Name"
-TAG_VALUE="ubuntu"
+TAG_VALUE="ctcdev"
 
 # Check S3 to see if we have updated configuration settings
 # By default, we expect a bucket called ec2-spotter-config, and a config file to override the above 3 settings
 # called ec2-spotter.ini
 # NOTE: us-east-1 is the only endpoint for S3 that has no location constraint
 # See here: http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
-if aws s3 --endpoint us-east-1 cp s3://ec2-spotter-config/ec2-spotter.ini  . ; then
-    . ec2-spotter.ini
-fi
+#if aws s3 --endpoint us-east-1 cp s3://ec2-spotter-config/ec2-spotter.ini  . ; then
+#    . ec2-spotter.ini
+#fi
 
 echo "Looking for a volume in $SOURCE_REGION with tags ${TAG_KEY} = ${TAG_VALUE}"
 SOURCE_VOLUME=$(${APIBIN}/ec2-describe-tags --region ${SOURCE_REGION} --filter "resource-type=volume" --filter "key=${TAG_KEY}" --filter "value=${TAG_VALUE}" | awk '{print $3}' | head -1)
@@ -103,7 +103,7 @@ fi
 echo ""
 echo "Attaching volume $PIVOT_VOLUME as /dev/sdj"
 # Attach volume
-${APIBIN}/ec2-attach-volume $PIVOT_VOLUME -d /dev/sdj
+${APIBIN}/ec2-attach-volume $PIVOT_VOLUME -d /dev/sdj --instance $INSTANCE_ID
 
 DEVICE=/dev/xvdj1
 NEWMNT=/new-root
