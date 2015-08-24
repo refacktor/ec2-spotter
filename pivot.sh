@@ -62,26 +62,8 @@ if [[ $SOURCE_ZONE != $DEST_ZONE ]]; then
     echo "------------------------------------------------"
     echo ""
     
-    # Copy the snapshot
-    NEW_SNAPSHOT=$(${APIBIN}/ec2-copy-snapshot -r ${SOURCE_REGION} -s ${SNAPSHOT} | awk '{print $2}')
-    
-    echo "Copying snapshot from $SOURCE_ZONE to $DEST_ZONE with name $NEW_SNAPSHOT. Waiting for completion"
-    
-    # Keep checking to see that snapshot has been copied
-    count=0
-    while /bin/true
-    do
-        sleep 30
-        eval count=$((count+30))
-        echo "... $count seconds gone. Still waiting..."
-        STATUS=$(${APIBIN}/ec2-describe-snapshots ${NEW_SNAPSHOT} | grep completed)
-
-        [[ ! -z $STATUS ]] && break
-    done
-
-    echo "Snapshot $NEW_SNAPSHOT created successfully"
-    echo "------------------------------------------------"
-    echo ""
+    # Copying the snapshot would be needed if the REGION was different. Old code available in git
+    NEW_SNAPSHOT=$SNAPSHOT
 
     # create volume from this new snapshot
     NEW_VOLUME=$(${APIBIN}/ec2-create-volume --snapshot ${NEW_SNAPSHOT} -z ${DEST_ZONE} | awk '{print $2}')
