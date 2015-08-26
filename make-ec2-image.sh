@@ -4,6 +4,8 @@ BUSYBOX_FS=/tmp/busybuild/busybox.fs
 
 if ! [ -e $BUSYBOX_FS ]; then echo "$BUSYBOX_FS: not found (did you run make-busybox.sh?)"; exit -1; fi
 
+PATH=ec2-ami-tools-1.5.7/bin:ec2-api-tools-1.7.5.0/bin:$PATH
+
 # default values to be overridden by local configuration
 export EC2_CERT=my-ec2-cert.pem
 export EC2_PRIVATE_KEY=my-ec2-private-key.pem
