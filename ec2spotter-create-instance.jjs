@@ -1,0 +1,55 @@
+#!/usr/bin/jjs
+
+var ROOT_VOL = arguments[0];
+var CURRENT_ZONE = $EXEC("curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone");
+var CURRENT_REGION  = CURRENT_ZONE.replaceAll("\\w$","");
+var PUB_KEY=`wget -q -O - "http://169.254.169.254/latest/meta-data/public-keys" | awk -F= '{print $2}'`;
+
+print("root vol: ${ROOT_VOL}, CURRENT_ZONE=${CURRENT_ZONE}, CURRENT_REGION=${CURRENT_REGION}, pk=${PUB_KEY}");
+
+$ENV["AWS_CREDENTIAL_FILE"] = "/root/.aws.creds";
+
+var vols = JSON.parse(`aws ec2 describe-volumes --volume-ids ${ROOT_VOL} --region ${CURRENT_REGION}`);
+
+var ROOT_ZONE = vols.Volumes[0].AvailabilityZone;
+var ROOT_NAME = vols.Volumes[0].Tags[0].Value;
+
+print("root vol zone=${ROOT_ZONE}, name-tag=${ROOT_NAME}");
+
+if(ROOT_NAME == "") {
+  print("root volume lacks a Name tag");
+  exit(-1);
+}
+
+var userData = `base64 user-data.txt`.replaceAll("\n","\\\\r\\\\n");
+
+var spec = <<EOD;
+{
+  "KeyName" : "Alex2",
+  "InstanceType": "m3.medium",
+  "ImageId" : "ami-d05e75b8",
+  "UserData" : "${userData}",
+  "BlockDeviceMappings": [
+    {
+      "DeviceName" : "/dev/sda1",
+      "Ebs": {
+        "VolumeSize": 8,
+        "DeleteOnTermination": true,
+        "VolumeType" : "gp2"
+      }
+    }
+  ]
+}
+EOD
+
+var specFOS = new java.io.FileOutputStream("spot_spec.json");
+specFOS.write(spec.getBytes());
+specFOS.close();
+
+var spotRsp = `aws ec2 request-spot-instances --spot-price 0.015 --type persistent --launch-specification file://spot_spec.json --region ${CURRENT_REGION}`;
+
+print(spotRsp);
+
+var SPOT_ID = JSON.parse(spotRsp).SpotInstanceRequests[0].SpotInstanceRequestId;
+
+`aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ROOT_NAME} --region ${CURRENT_REGION}`;

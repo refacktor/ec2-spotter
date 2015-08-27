@@ -1,0 +1,84 @@
+#!/bin/bash
+
+if [ "$1" = "" ]; then echo "USER ERROR: You forgot to specify the volume-id"; exit -1; fi
+
+ROOT_VOL=$1
+
+CURRENT_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
+CURRENT_REGION=$(echo $CURRENT_ZONE | sed -e 's/.$//')
+PUB_KEY=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
+
+echo "ROOT_VOL=${ROOT_VOL}; CURRENT_ZONE=${CURRENT_ZONE}; CURRENT_REGION=${CURRENT_REGION}; PUB_KEY=${PUB_KEY}"
+
+export AWS_CREDENTIAL_FILE=/root/.aws.creds
+. /root/.aws.creds
+export AWS_ACCESS_KEY=$AWSAccessKeyId
+export AWS_SECRET_KEY=$AWSSecretKey
+
+aws ec2 describe-volumes --volume-ids ${ROOT_VOL} --region ${CURRENT_REGION} > volumes.tmp
+
+ROOT_ZONE=$(jq -r '.Volumes[0].AvailabilityZone' volumes.tmp)
+ROOT_NAME=$(jq -r '.Volumes[0].Tags[0].Value' volumes.tmp)
+
+echo "root vol zone=${ROOT_ZONE}, name-tag=${ROOT_NAME}";
+
+if [ "$ROOT_NAME" = "" ]
+then
+  echo "root volume lacks a Name tag";
+  exit -1;
+fi
+
+cat >user-data.tmp <<EOF
+#!/bin/sh
+echo AWSAccessKeyId=$AWSAccessKeyId > /root/.aws.creds
+echo AWSSecretKey=$AWSSecretKey >> /root/.aws.creds
+apt-get update -y
+apt-get install -y make gcc ruby unzip git
+apt-get -y install python-software-properties
+yes | add-apt-repository ppa:webupd8team/java
+apt-get update
+apt-get -y install default-jre
+apt-get install -y python-pip
+pip install awscli
+
+# Bundled in git clone
+# wget https://ec2-downloads.s3.amazonaws.com/ec2-api-tools.zip
+# wget http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip
+# wget http://www.busybox.net/downloads/busybox-1.23.2.tar.bz2
+
+cd /root
+git clone https://github.com/atramos/ec2-spotter.git
+EOF
+
+userData=$(base64 user-data.tmp | tr -d '\n');
+
+cat >spot_spec.json <<EOF
+{
+  "KeyName" : "Alex2",
+  "InstanceType": "m3.medium",
+  "ImageId" : "ami-d05e75b8",
+  "UserData" : "${userData}",
+  "BlockDeviceMappings": [
+    {
+      "DeviceName" : "/dev/sda1",
+      "Ebs": {
+        "VolumeSize": 8,
+        "DeleteOnTermination": true,
+        "VolumeType" : "gp2"
+      }
+    }
+  ]
+}
+EOF
+
+aws ec2 request-spot-instances --spot-price 0.015 --type persistent --launch-specification file://spot_spec.json --region ${CURRENT_REGION} > spot.tmp
+
+cat spot.tmp
+
+SPOT_ID=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' spot.tmp)
+
+echo SPOT_ID=$SPOT_ID
+echo ROOT_NAME=$ROOT_NAME
+echo CURRENT_REGION=$CURRENT_REGION
+
+aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ROOT_NAME} --region ${CURRENT_REGION}

@@ -1,0 +1,16 @@
+{
+  "KeyName" : "Alex2",
+  "InstanceType": "m3.medium",
+  "ImageId" : "ami-d05e75b8",
+  "UserData" : "file://user-data.txt",
+  "BlockDeviceMappings": [
+    {
+      "DeviceName" : "/dev/sda1",
+      "Ebs": {
+	"VolumeSize": 8,
+	"DeleteOnTermination": true,
+	"VolumeType" : "gp2"
+      }
+    }
+  ]
+}	
