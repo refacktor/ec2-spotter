@@ -101,23 +101,25 @@ do
   sleep 10
 done
 
-DEVICE=/dev/xvdj1
-NEWMNT=/new-root
-OLDMNT=old-root
-
-echo "Mounting $DEVICE ON $NEWMNT"
-mount $DEVICE $NEWMNT || exit -1
-
-[ ! -d $NEWMNT/$OLDMNT ] && echo "Creating directory $NEWMNT/$OLDMNT." && mkdir -p $NEWMNT/$OLDMNT
-
-echo "Trying to pivot."
-cd $NEWMNT
-pivot_root . ./$OLDMNT
-
-for dir in /dev /proc /sys /run; do
-    echo "Moving mounted file system ${OLDMNT}${dir} to $dir."
-    mount --move ./${OLDMNT}${dir} ${dir}
-done
-
-echo "Trying to chroot."
-exec chroot . /bin/sh -c "umount ./$OLDMNT; cat /proc/mounts > /etc/mtab; exec /sbin/init" < /dev/console > /dev/console 2>&1
+# all this stuff not working
+#
+#DEVICE=/dev/xvdj1
+#NEWMNT=/new-root
+#OLDMNT=old-root
+#
+#echo "Mounting $DEVICE ON $NEWMNT"
+#mount $DEVICE $NEWMNT || exit -1
+#
+#[ ! -d $NEWMNT/$OLDMNT ] && echo "Creating directory $NEWMNT/$OLDMNT." && mkdir -p $NEWMNT/$OLDMNT
+#
+#echo "Trying to pivot."
+#cd $NEWMNT
+#pivot_root . ./$OLDMNT
+#
+#for dir in /dev /proc /sys /run; do
+#    echo "Moving mounted file system ${OLDMNT}${dir} to $dir."
+#    mount --move ./${OLDMNT}${dir} ${dir}
+#done
+#
+#echo "Trying to chroot."
+#exec chroot . /bin/sh -c "umount ./$OLDMNT; cat /proc/mounts > /etc/mtab; exec /sbin/init" < /dev/console > /dev/console 2>&1
