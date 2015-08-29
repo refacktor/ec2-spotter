@@ -33,4 +33,4 @@ GRUB_DISABLE_LINUX_UUID=true
 # Uncomment to get a beep at grub start
 #GRUB_INIT_TUNE="480 440 1"
 
-GRUB_DISABLE_OS_PROBER=true
+GRUB_DISABLE_OS_PROBER=false
