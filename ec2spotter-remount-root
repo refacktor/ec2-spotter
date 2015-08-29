@@ -115,28 +115,30 @@ do
 done
 
 DEVICE=/dev/xvdf1
-NEWMNT=/p-root
+NEWMNT=/permaroot
+
+e2label $DEVICE permaroot
+tune2fs $DEVICE -U `uuidgen`
+#cp grub /$NEWMNT/etc/default/grub
 
 mkdir $NEWMNT
 mount $DEVICE $NEWMNT
 
-e2label /dev/xvda1 ec2temp
-tune2fs -O ^uninit_bg /dev/xvda1
-tune2fs /dev/xvda1 -U `uuidgen`
-cp grub /$NEWMNT/etc/default/grub
-
 OLDMNT=old-root
-
 [ ! -d $NEWMNT/$OLDMNT ] && mkdir -p $NEWMNT/$OLDMNT
 
-cd $NEWMNT
-pivot_root . ./$OLDMNT
+update-grub
+grub-install --boot-directory=/$NEWMNT/boot /dev/xvda
+#shutdown -r now
 
-for dir in /dev /proc /sys /run; do
-    mount --move ./${OLDMNT}${dir} ${dir}
-done
+#cd $NEWMNT
+#pivot_root . ./$OLDMNT
 
-chroot . /bin/sh -c "update-grub; grub-install /dev/xvda; grub-install /dev/xvdf"
+#for dir in /dev /proc /sys /run; do
+#    mount --move ./${OLDMNT}${dir} ${dir}
+#done
+
+#chroot . /bin/sh -c "update-grub; grub-install /dev/xvda"
 
 #exec chroot . /bin/sh -c "cat /proc/mounts > /etc/mtab; exec /sbin/init" < /dev/console > /dev/console 2>&1
 
