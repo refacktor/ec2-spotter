@@ -127,8 +127,9 @@ mount $DEVICE $NEWMNT
 OLDMNT=old-root
 [ ! -d $NEWMNT/$OLDMNT ] && mkdir -p $NEWMNT/$OLDMNT
 
+mv /etc/grub.d/10_linux /tmp
 update-grub
-grub-install --boot-directory=/$NEWMNT/boot /dev/xvda
+#grub-install --boot-directory=/$NEWMNT/boot /dev/xvda
 #shutdown -r now
 
 #cd $NEWMNT
