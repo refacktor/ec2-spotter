@@ -3,27 +3,30 @@
 if [ "$1" = "" ]; then echo "USER ERROR: please specify a configuration file"; exit -1; fi
 
 . ./$1
-ROOT_VOL=$ec2spotter_volume_id
+ROOT_VOL_NAME=$ec2spotter_volume_name
 
 CURRENT_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
 CURRENT_REGION=$(echo $CURRENT_ZONE | sed -e 's/.$//')
 PUB_KEY=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
 
-echo "ROOT_VOL=${ROOT_VOL}; CURRENT_ZONE=${CURRENT_ZONE}; CURRENT_REGION=${CURRENT_REGION}; PUB_KEY=${PUB_KEY}"
+echo "ROOT_VOL_NAME=${ROOT_VOL_NAME}; CURRENT_ZONE=${CURRENT_ZONE}; CURRENT_REGION=${CURRENT_REGION}; PUB_KEY=${PUB_KEY}"
 
 export AWS_CREDENTIAL_FILE=/root/.aws.creds
 . /root/.aws.creds
 export AWS_ACCESS_KEY=$AWSAccessKeyId
 export AWS_SECRET_KEY=$AWSSecretKey
 
-aws ec2 describe-volumes --volume-ids ${ROOT_VOL} --region ${CURRENT_REGION} > volumes.tmp
+aws ec2 describe-volumes \
+	--filters Name=tag-key,Values="Name" Name=tag-value,Values="$ROOT_VOL_NAME" \
+	--region ${CURRENT_REGION} > volumes.tmp || exit -1
 
 ROOT_ZONE=$(jq -r '.Volumes[0].AvailabilityZone' volumes.tmp)
-ROOT_NAME=$(jq -r '.Volumes[0].Tags[0].Value' volumes.tmp)
+ROOT_VOL=$(jq -r '.Volumes[0].VolumeId' volumes.tmp)
+ROOT_TYPE=$(jq -r '.Volumes[0].VolumeType' volumes.tmp)
 
-echo "root vol zone=${ROOT_ZONE}, name-tag=${ROOT_NAME}";
+echo "ROOT_ZONE=${ROOT_ZONE}; ROOT_VOL_NAME=${ROOT_VOL_NAME}; ROOT_TYPE=$ROOT_TYPE; ROOT_VOL=$ROOT_VOL";
 
-if [ "$ROOT_NAME" = "" ]
+if [ "$ROOT_VOL_NAME" = "" ]
 then
   echo "root volume lacks a Name tag";
   exit -1;
@@ -41,7 +44,7 @@ git clone https://github.com/atramos/ec2-spotter.git
 
 cd ec2-spotter
 ./ec2spotter-setup
-./ec2spotter-remount-root ${ROOT_VOL}
+./ec2spotter-remount-root ${ROOT_VOL_NAME} --force
 EOF
 
 userData=$(base64 user-data.tmp | tr -d '\n');
@@ -67,12 +70,10 @@ EOF
 
 aws ec2 request-spot-instances --spot-price $ec2spotter_bid_price --type persistent --launch-specification file://specs.tmp --region ${CURRENT_REGION} > spot.tmp
 
-cat spot.tmp
-
 SPOT_ID=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' spot.tmp)
 
 echo SPOT_ID=$SPOT_ID
-echo ROOT_NAME=$ROOT_NAME
+echo ROOT_VOL_NAME=$ROOT_VOL_NAME
 echo CURRENT_REGION=$CURRENT_REGION
 
-aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ROOT_NAME} --region ${CURRENT_REGION}
+aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ROOT_VOL_NAME} --region ${CURRENT_REGION}

@@ -34,9 +34,9 @@ AWSAccessKeyId=XXXXXXXXXXXXXXXXXXXX
 AWSSecretKey=XXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-3) Create a bootable EBS volume (or grab one from a stopped On Demand instance that you want to replace with a Spot Instance) and write down the Volume ID
+3) Create a bootable EBS volume (or grab one from a stopped On Demand instance that you want to replace with a Spot Instance) and give it a unique Name (you can change the Name under the main 'Volumes' tab in the AWS Console or under Tags)
 
-4) Edit the `example.conf` file, change the Volume ID to the value obtained in Step 3.
+4) Edit the `example.conf` file, change the Volume Name to the value assigned in Step 3.
 
 5) Launch the spot instance: 
 

@@ -1,8 +1,9 @@
 #!/bin/bash
 
-if [ "$1" = "" ]; then echo "USER ERROR: You forgot to specify the volume-id"; exit -1; fi
+if [ "$1" = "" ]; then echo "missing volume name"; exit -1; fi
+if ! [ x$2 = "x--force" ]; then echo "This script is destructive. Please specify the mandatory option --force"; fi
 
-ROOT_VOL=$1
+ROOT_VOL_NAME=$1
 
 export AWS_CREDENTIAL_FILE=/root/.aws.creds
 . /root/.aws.creds
@@ -24,11 +25,15 @@ export SPOT_REGION=${SPOT_ZONE::-1} # Get the region by stripping the last chara
 ROOT_REGION=$SPOT_REGION # By default, we're in the same region
 #ROOT_ZONE=$SPOT_ZONE
 
-echo "Looking for a volume in $ROOT_REGION with ID = $ROOT_VOL"
+echo "Looking for a volume in $ROOT_REGION with Name = $ROOT_VOL_NAME"
 
-aws ec2 describe-volumes --volume-ids ${ROOT_VOL} --region ${ROOT_REGION} > volumes.tmp
+aws ec2 describe-volumes \
+        --filters Name=tag-key,Values="Name" Name=tag-value,Values="$ROOT_VOL_NAME" \
+        --region ${CURRENT_REGION} > volumes.tmp || exit -1
 
 ROOT_ZONE=$(jq -r '.Volumes[0].AvailabilityZone' volumes.tmp)
+ROOT_VOL=$(jq -r '.Volumes[0].VolumeId' volumes.tmp)
+ROOT_TYPE=$(jq -r '.Volumes[0].VolumeType' volumes.tmp)
 
 # Are we copying the volume from the same region?
 if [[ $ROOT_ZONE != $SPOT_ZONE ]]; then
@@ -78,7 +83,7 @@ if [[ $ROOT_ZONE != $SPOT_ZONE ]]; then
     fi
 
     # create volume from this new snapshot
-    NEW_VOLUME=$(${APIBIN}/ec2-create-volume --snapshot ${NEW_SNAPSHOT} -z ${SPOT_ZONE} | awk '{print $2}')
+    NEW_VOLUME=$(${APIBIN}/ec2-create-volume --snapshot ${NEW_SNAPSHOT} -z ${SPOT_ZONE} --type $ROOT_TYPE | awk '{print $2}')
     echo "Creating volume $NEW_VOLUME from $NEW_SNAPSHOT. Waiting for completion"
     
     # Keep checking to see that volume has been created
@@ -96,6 +101,8 @@ if [[ $ROOT_ZONE != $SPOT_ZONE ]]; then
     echo "Volume $NEW_VOLUME created successfully"
     echo "------------------------------------------------"
 
+    echo "Renaming the old volume"
+    aws ec2 create-tags --resources ${ROOT_VOL} --tags Key=Name,Value="${ROOT_VOL_NAME}-is-now-$NEW_VOLUME" --region ${CURRENT_REGION}
 
     PERSISTENT_ROOT_VOLUME=${NEW_VOLUME}
 else
