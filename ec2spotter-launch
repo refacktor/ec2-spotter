@@ -1,8 +1,9 @@
 #!/bin/bash
 
-if [ "$1" = "" ]; then echo "USER ERROR: You forgot to specify the volume-id"; exit -1; fi
+if [ "$1" = "" ]; then echo "USER ERROR: please specify a configuration file"; exit -1; fi
 
-ROOT_VOL=$1
+. ./$1
+ROOT_VOL=$ec2spotter_volume_id
 
 CURRENT_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
 CURRENT_REGION=$(echo $CURRENT_ZONE | sed -e 's/.$//')
@@ -48,8 +49,8 @@ userData=$(base64 user-data.tmp | tr -d '\n');
 cat >specs.tmp <<EOF
 {
   "KeyName" : "$PUB_KEY",
-  "InstanceType": "m4.large",
-  "ImageId" : "ami-d05e75b8",
+  "InstanceType": "$ec2spotter_instance_type",
+  "ImageId" : "$ec2spotter_preboot_image_id",
   "UserData" : "${userData}",
   "BlockDeviceMappings": [
     {
@@ -64,7 +65,7 @@ cat >specs.tmp <<EOF
 }
 EOF
 
-aws ec2 request-spot-instances --spot-price 0.025 --type persistent --launch-specification file://specs.tmp --region ${CURRENT_REGION} > spot.tmp
+aws ec2 request-spot-instances --spot-price $ec2spotter_bid_price --type persistent --launch-specification file://specs.tmp --region ${CURRENT_REGION} > spot.tmp
 
 cat spot.tmp
 

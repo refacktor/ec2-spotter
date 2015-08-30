@@ -2,45 +2,62 @@
 
 EC2 Spot Instances are cheaper than On Demand instances and even Reserved Instances.
 
-BUT there are several challenges in trying to run a Spot Instance without completely rearchitecting
-the underlying platform and applications: 
-1) EC2 does not allow specifying an EBS volume as root of a Spot Instance, only an AMI image, which leads to the
-creation of an EPHEMERAL (temporary) EBS volume, 2) Spot Instances cannot be Stopped, they can only be
-Rebooted or Terminated, that exacerbates issue#1 as it means it's impossible to detach /dev/xvda1 and attach another
-disk as the root device after the instance has launched, 3) Every time the instance is re-launched, a brand new EBS
-volume is created from the AMI (see point#1 about the EBS being ephemeral), that breaks continuity from the previous EBS volume so things
-like /var/log, crontab, apt-get updates, etc, are lost and basically they expect you to run a fully re-designed system that saves 
-everything important somewhere else.
+BUT there are several challenges in trying to run a Spot Instance for "normal" Linux-based applications: 
 
+1. EC2 does not allow specifying an EBS volume as root of a Spot Instance, only an AMI image, 
+2. Every time a Spot Instance is re-launched, a brand new EBS volume is created from the AMI (see point#1), which leads to the creation of a fresh new EBS volume wiped and restored from the AMI, 
+3. Spot Instances cannot be Stopped, they can only be Rebooted or Terminated, that exacerbates issue#1 as it means it's impossible to simply reattach your original EBS volume to /dev/xvda, 
+4. Important system files like /var/log, crontab, apt-get updates, etc, are LOST every time you restart a Spot Instance (directly caused by points #1 and #2 above)
+5. Essentially, Amazon expects you to run a redesigned Linux system that saves everything important somewhere else outside of the filesystem, and to-date no Linux distribution exists which does this out of the box.
 
-# ec2-spotter
+# Introducing ec2-spotter
 
 EC2-Spotter is a utility that brings together the best of both worlds -- Spot Instance pricing with
-the simplicity of On Demand & Reserved Instances. This sounds like cheating, but apparently is not
-forbidden by the Amazon Terms Of Service.
+the simplicity (persistent EBS filesystem) of On Demand & Reserved Instances. This sounds like cheating, but apparently is not forbidden by the Amazon Terms Of Service.
 
 # Running ec2-spotter
 
-1. cd /root; git clone https://github.com/atramos/ec2-spotter.git
-2. create /root/.aws.creds with your actual IAM credentials with EBS/EC2 privilege in this format:
+1) Get the scripts onto your local workstation (or a throw-away EC2 instance) and install the pre-requisites:
+
+```
+sudo su -
+cd /root
+git clone https://github.com/atramos/ec2-spotter.git
+cd ec2-spotter
+./ec2spotter-setup
+```
+
+2) Create `/root/.aws.creds` with your actual IAM credentials with EC2 privileges in this format:
+
+```
 AWSAccessKeyId=XXXXXXXXXXXXXXXXXXXX
 AWSSecretKey=XXXXXXXXXXXXXXXXXXXXXXXXXX
-3. create a bootable EBS volume (or borrow one from an On Demand instance)
-4. launch the spot instance:
-./ec2spotter-launch vol-XXXXXXXX
+```
+
+3) Create a bootable EBS volume (or grab one from a stopped On Demand instance that you want to replace with a Spot Instance) and write down the Volume ID
+
+4) Edit the `example.conf` file, change the Volume ID to the value obtained in Step 3.
+
+5) Launch the spot instance: 
+
+```
+./ec2spotter-launch example.conf
+```
 
 # How does it work?
 
-It's quite simple, really. The scripts attach a specified EBS volume to /dev/xvdf as a 2nd disk, to be used as 
-the system root filesystem. When the instance is first created or restarted following an interruption,
-the /sbin/init on the AMI-based EBS volume (/dev/xvda1) is replaced with a small shell script which chain-loads the
-/sbin/init from the specified persistent EBS volume (/dev/xvdf1). An extra reboot is performed when the
-instance first comes up. The end-result is a full Linux system booted from and running on the 2nd, persitent disk,
-instead of the 1st, ephemeral disk.
+It's quite simple, really. The launch script employs user-data to create a boot-time scripts that attaches the 
+specified EBS volume to `/dev/xvdf` and then proceeds to do a `pivot_root` and `chroot` in order to use  it as 
+the main system disk in place of `/dev/xvda`. When the instance is first created or restarted following an interruption,
+the `/sbin/init` on the AMI-based EBS volume (`/dev/xvda1`) is replaced with a small shell script which performs the magic `pivot_root` and `chroot` and then chain-loads the `/sbin/init` from the specified persistent EBS volume (`/dev/xvdf1`). 
+An extra reboot is performed when the instance first comes up, to ensure a clean slate. 
+The end-result is a full Linux system running on the persistent volume `dev/xvdf` mounted as `/`.
+The ephemeral disk remains mounted under `/old-root` and can be unmounted if needed.
 
 # Caveats
 
-The instance boots using the kernel and initrd from /dev/xvda1, which is supplied by the AMI. Nothing is done
+The instance boots using the kernel and initrd from `/dev/xvda1`, which is supplied by the AMI. Nothing is done
 to ensure compatibility with the system that's present on the persistent EBS volume. You need to make sure they
-are compatible, if not identical.  Currently the AMI ID is hard-coded in ec2spotter-launch and it is set to
-Ubuntu 14.04 HVM 64-bit. This hasn't been tested with any other AMIs.
+are compatible, if not identical.  The AMI ID supplied in the example.conf is Ubuntu 14.04 HVM 64-bit, and should
+be changed to an AMI that has the same Kernel version as your target EBS system volume. This hasn't 
+been tested with any other AMIs.
