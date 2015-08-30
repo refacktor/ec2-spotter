@@ -44,7 +44,7 @@ git clone https://github.com/atramos/ec2-spotter.git
 
 cd ec2-spotter
 ./ec2spotter-setup
-./ec2spotter-remount-root ${ROOT_VOL_NAME} --force $ec2spotter_elastic_ip
+./ec2spotter-remount-root --force ${ROOT_VOL_NAME} $ec2spotter_elastic_ip
 EOF
 
 userData=$(base64 user-data.tmp | tr -d '\n');

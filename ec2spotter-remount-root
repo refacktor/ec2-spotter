@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ "$1" = "" ]; then echo "missing volume name"; exit -1; fi
-if ! [ "x$2" = "x--force" ]; then echo "This script is destructive. Please specify the mandatory option --force"; exit -1; fi
+if ! [ "x$1" = "x--force" ]; then echo "This script is destructive. Please specify the mandatory option --force"; exit -1; fi
+if [ "x$2" = "x" ]; then echo "missing volume name"; exit -1; fi
 
+ROOT_VOL_NAME=$2
 ec2spotter_elastic_ip=$3
-ROOT_VOL_NAME=$1
 
 export AWS_CREDENTIAL_FILE=/root/.aws.creds
 . /root/.aws.creds
