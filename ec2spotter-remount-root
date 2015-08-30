@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$1" = "" ]; then echo "missing volume name"; exit -1; fi
-if ! [ x$2 = "x--force" ]; then echo "This script is destructive. Please specify the mandatory option --force"; fi
+if ! [ "x$2" = "x--force" ]; then echo "This script is destructive. Please specify the mandatory option --force"; exit -1; fi
 
 ROOT_VOL_NAME=$1
 
