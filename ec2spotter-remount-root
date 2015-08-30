@@ -116,20 +116,16 @@ done
 
 DEVICE=/dev/xvdf1
 NEWMNT=/permaroot
-
 e2label $DEVICE permaroot
 tune2fs $DEVICE -U `uuidgen`
-cp grub /$NEWMNT/etc/default/grub
-
 mkdir $NEWMNT
 mount $DEVICE $NEWMNT
 
-#chroot $NEWMNT sh -c 'mv /etc/grub.d/10_linux /tmp; update-grub; update-grub-legacy-ec2; grub-install /dev/xvda'
+exit
 
-#shutdown -r now
+cp grub $NEWMNT/etc/default/grub
 
 OLDMNT=old-root
-
 [ ! -d $NEWMNT/$OLDMNT ] && mkdir -p $NEWMNT/$OLDMNT
 
 cd $NEWMNT
@@ -140,5 +136,6 @@ for dir in /dev /proc /sys /run; do
     mount --move ./${OLDMNT}${dir} ${dir}
 done
 
-exec chroot . /bin/bash -c 'grub-install /dev/xvda; update-grub; shutdown -r now'
+#chroot $NEWMNT sh -c 'mv /etc/grub.d/10_linux /tmp; update-grub; update-grub-legacy-ec2; grub-install /dev/xvda'
+#exec chroot $NEWMNT sh -c 'grub-install /dev/xvda; update-grub; shutdown -r now'
 
