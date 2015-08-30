@@ -125,7 +125,7 @@ done
 # acquire the elastic ip
 if ! [ "$ec2spotter_elastic_ip"x = x ]
 then
-  aws ec2 associate-address --instance-id $INSTANCE_ID --allocation-id $ec2spotter_elastic_ip --allow-reassociation
+  aws ec2 associate-address --instance-id $INSTANCE_ID --allocation-id $ec2spotter_elastic_ip --allow-reassociation --region ${SPOT_REGION}
 fi
 
 DEVICE=/dev/xvdf1
