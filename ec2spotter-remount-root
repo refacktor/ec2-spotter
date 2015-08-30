@@ -59,9 +59,9 @@ if [[ $ROOT_ZONE != $SPOT_ZONE ]]; then
     echo ""
     
     if [[ $SPOT_REGION != $ROOT_REGION ]]; then
-	    NEW_SNAPSHOT=$(${APIBIN}/ec2-copy-snapshot -r ${SOURCE_REGION} -s ${SNAPSHOT} | awk '{print $2}')
+	    NEW_SNAPSHOT=$(${APIBIN}/ec2-copy-snapshot -r ${ROOT_REGION} -s ${SNAPSHOT} | awk '{print $2}')
     		
-	    echo "Copying snapshot from $SOURCE_REGION to $DEST_REGION with name $NEW_SNAPSHOT. Waiting for completion"		
+	    echo "Copying snapshot from $ROOT_REGION to $SPOT_REGION with name $NEW_SNAPSHOT. Waiting for completion"		
 			
 	    # Keep checking to see that snapshot has been copied		
 	    count=0		
@@ -102,7 +102,7 @@ if [[ $ROOT_ZONE != $SPOT_ZONE ]]; then
     echo "------------------------------------------------"
 
     echo "Renaming the old volume"
-    aws ec2 create-tags --resources ${ROOT_VOL} --tags Key=Name,Value="${ROOT_VOL_NAME}-is-now-$NEW_VOLUME" --region ${CURRENT_REGION}
+    aws ec2 create-tags --resources ${ROOT_VOL} --tags Key=Name,Value="${ROOT_VOL_NAME}-is-now-$NEW_VOLUME" --region ${SPOT_REGION}
 
     PERSISTENT_ROOT_VOLUME=${NEW_VOLUME}
 else
