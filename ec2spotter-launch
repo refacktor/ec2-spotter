@@ -56,7 +56,7 @@ cat >specs.tmp <<EOF
       "DeviceName" : "/dev/sda1",
       "Ebs": {
         "VolumeSize": 8,
-        "DeleteOnTermination": false,
+        "DeleteOnTermination": true,
         "VolumeType" : "gp2"
       }
     }
