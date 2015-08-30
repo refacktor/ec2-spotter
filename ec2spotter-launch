@@ -5,11 +5,11 @@ if [ "$1" = "" ]; then echo "USER ERROR: please specify a configuration file"; e
 . ./$1
 ROOT_VOL_NAME=$ec2spotter_volume_name
 
-CURRENT_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
-CURRENT_REGION=$(echo $CURRENT_ZONE | sed -e 's/.$//')
+LAUNCH_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
+LAUNCH_REGION=$(echo $LAUNCH_ZONE | sed -e 's/.$//')
 PUB_KEY=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
 
-echo "ROOT_VOL_NAME=${ROOT_VOL_NAME}; CURRENT_ZONE=${CURRENT_ZONE}; CURRENT_REGION=${CURRENT_REGION}; PUB_KEY=${PUB_KEY}"
+echo "ROOT_VOL_NAME=${ROOT_VOL_NAME}; LAUNCH_ZONE=${LAUNCH_ZONE}; LAUNCH_REGION=${LAUNCH_REGION}; PUB_KEY=${PUB_KEY}"
 
 export AWS_CREDENTIAL_FILE=/root/.aws.creds
 . /root/.aws.creds
@@ -18,13 +18,13 @@ export AWS_SECRET_KEY=$AWSSecretKey
 
 aws ec2 describe-volumes \
 	--filters Name=tag-key,Values="Name" Name=tag-value,Values="$ROOT_VOL_NAME" \
-	--region ${CURRENT_REGION} > volumes.tmp || exit -1
+	--region ${LAUNCH_REGION} > volumes.tmp || exit -1
 
 ROOT_ZONE=$(jq -r '.Volumes[0].AvailabilityZone' volumes.tmp)
 ROOT_VOL=$(jq -r '.Volumes[0].VolumeId' volumes.tmp)
 ROOT_TYPE=$(jq -r '.Volumes[0].VolumeType' volumes.tmp)
 
-echo "ROOT_ZONE=${ROOT_ZONE}; ROOT_VOL_NAME=${ROOT_VOL_NAME}; ROOT_TYPE=$ROOT_TYPE; ROOT_VOL=$ROOT_VOL";
+echo "ROOT_ZONE=${ROOT_ZONE}; ROOT_TYPE=$ROOT_TYPE; ROOT_VOL=$ROOT_VOL";
 
 if [ "$ROOT_VOL_NAME" = "" ]
 then
@@ -68,12 +68,10 @@ cat >specs.tmp <<EOF
 }
 EOF
 
-aws ec2 request-spot-instances --spot-price $ec2spotter_bid_price --type persistent --launch-specification file://specs.tmp --region ${CURRENT_REGION} > spot.tmp
+aws ec2 request-spot-instances --spot-price $ec2spotter_bid_price --type persistent --launch-specification file://specs.tmp --region ${LAUNCH_REGION} > spot.tmp
 
 SPOT_ID=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' spot.tmp)
 
 echo SPOT_ID=$SPOT_ID
-echo ROOT_VOL_NAME=$ROOT_VOL_NAME
-echo CURRENT_REGION=$CURRENT_REGION
 
-aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ROOT_VOL_NAME} --region ${CURRENT_REGION}
+aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ROOT_VOL_NAME} --region ${LAUNCH_REGION}
