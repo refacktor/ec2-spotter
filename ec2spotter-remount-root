@@ -124,6 +124,21 @@ cp grub /$NEWMNT/etc/default/grub
 mkdir $NEWMNT
 mount $DEVICE $NEWMNT
 
-chroot $NEWMNT sh -c 'mv /etc/grub.d/10_linux /tmp; update-grub; update-grub-legacy-ec2; grub-install /dev/xvda'
+#chroot $NEWMNT sh -c 'mv /etc/grub.d/10_linux /tmp; update-grub; update-grub-legacy-ec2; grub-install /dev/xvda'
 
 #shutdown -r now
+
+OLDMNT=old-root
+
+[ ! -d $NEWMNT/$OLDMNT ] && mkdir -p $NEWMNT/$OLDMNT
+
+cd $NEWMNT
+pivot_root . ./$OLDMNT
+
+for dir in /dev /proc /sys /run; do
+    echo "Moving mounted file system ${OLDMNT}${dir} to $dir."
+    mount --move ./${OLDMNT}${dir} ${dir}
+done
+
+exec chroot . /bin/bash -c 'grub-install /dev/xvda; update-grub; shutdown -r now'
+
