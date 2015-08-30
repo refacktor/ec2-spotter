@@ -29,7 +29,7 @@ echo "Looking for a volume in $ROOT_REGION with Name = $ROOT_VOL_NAME"
 
 aws ec2 describe-volumes \
         --filters Name=tag-key,Values="Name" Name=tag-value,Values="$ROOT_VOL_NAME" \
-        --region ${CURRENT_REGION} > volumes.tmp || exit -1
+        --region ${SPOT_REGION} > volumes.tmp || exit -1
 
 ROOT_ZONE=$(jq -r '.Volumes[0].AvailabilityZone' volumes.tmp)
 ROOT_VOL=$(jq -r '.Volumes[0].VolumeId' volumes.tmp)
