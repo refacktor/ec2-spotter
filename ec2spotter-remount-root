@@ -116,26 +116,29 @@ done
 
 DEVICE=/dev/xvdf1
 NEWMNT=/permaroot
+OLDMNT=old-root
 e2label $DEVICE permaroot
 tune2fs $DEVICE -U `uuidgen`
 mkdir $NEWMNT
+
+#
+# point of no return... 
+# modify /sbin/init on the ephemeral volume to chain-load from the persistent EBS volume, and then reboot.
+#
+mv /sbin/init /sbin/init.backup
+cat >/sbin/init <<EOF
+#!/bin/sh
 mount $DEVICE $NEWMNT
-
-exit
-
-cp grub $NEWMNT/etc/default/grub
-
-OLDMNT=old-root
 [ ! -d $NEWMNT/$OLDMNT ] && mkdir -p $NEWMNT/$OLDMNT
 
 cd $NEWMNT
 pivot_root . ./$OLDMNT
 
 for dir in /dev /proc /sys /run; do
-    echo "Moving mounted file system ${OLDMNT}${dir} to $dir."
-    mount --move ./${OLDMNT}${dir} ${dir}
+    echo "Moving mounted file system ${OLDMNT}\${dir} to \$dir."
+    mount --move ./${OLDMNT}\${dir} \${dir}
 done
-
-#chroot $NEWMNT sh -c 'mv /etc/grub.d/10_linux /tmp; update-grub; update-grub-legacy-ec2; grub-install /dev/xvda'
-#exec chroot $NEWMNT sh -c 'grub-install /dev/xvda; update-grub; shutdown -r now'
-
+exec chroot . /sbin/init
+EOF
+chmod +x /sbin/init
+shutdown -r now
