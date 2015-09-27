@@ -1,8 +1,10 @@
 #!/bin/bash
 
+# "Phase 1" this is the user-facing script for launching a new spot istance
+
 if [ "$1" = "" ]; then echo "USER ERROR: please specify a configuration file"; exit -1; fi
 
-. ./$1
+. $1 || exit -1
 ROOT_VOL_NAME=$ec2spotter_volume_name
 
 LAUNCH_ZONE=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
@@ -61,7 +63,7 @@ cat >specs.tmp <<EOF
       "Ebs": {
         "VolumeSize": 8,
         "DeleteOnTermination": true,
-        "VolumeType" : "gp2"
+        "VolumeType" : "standard"
       }
     }
   ]

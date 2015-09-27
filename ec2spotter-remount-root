@@ -1,6 +1,14 @@
 #!/bin/bash
 
-if ! [ "x$1" = "x--force" ]; then echo "This script is destructive. Please specify the mandatory option --force"; exit -1; fi
+# "Phase 2" this script is invoked inside of the spot VM at boot time to find the root volume.
+
+if ! [ "x$1" = "x--force" ]
+then 
+  # this is here just to cover accidental invocation from the command-line. it should "never happen"
+  echo "This script is destructive when invoked at the wrong time. If you are seeing this message you are doing something wrong."
+  exit -1
+fi
+
 if [ "x$2" = "x" ]; then echo "missing volume name"; exit -1; fi
 
 ROOT_VOL_NAME=$2
