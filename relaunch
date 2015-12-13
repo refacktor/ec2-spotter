@@ -14,19 +14,24 @@ SELF=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 IMAGE_ID=$(aws ec2 describe-images --filters Name=tag-key,Values="Name" Name=tag-value,Values=$ec2spotter_image_name --owners self \
    |jq -r '.Images[0].ImageId')
 
-if [ $IMAGE_ID != "null" ] && [ $IMAGE_ID != "" ]
+if [ "$ec2spotter_reuse_images" != 1 ] && [ $IMAGE_ID != "null" ] && [ $IMAGE_ID != "" ]
 then
 	aws ec2 deregister-image --image-id $IMAGE_ID
 fi
 
-echo "Creating AMI image."
-IMAGE_ID=$(aws ec2 create-image --instance-id $SELF --no-reboot --name $ec2spotter_image_name | jq -r '.ImageId')
-while [ ! $(aws ec2 describe-images --image-ids $IMAGE_ID | jq -r '.Images[0].State') = "available" ]
-do
-  sleep 5
-  echo "Waiting for image $IMAGE_ID"
-done
-aws ec2 create-tags --resources $IMAGE_ID --tags Key=Name,Value=$ec2spotter_image_name
+if [ "$ec2spotter_reuse_images" != 1 ]
+then
+	echo "Creating AMI image."
+	IMAGE_ID=$(aws ec2 create-image --instance-id $SELF --no-reboot --name $ec2spotter_image_name | jq -r '.ImageId')
+	while [ ! $(aws ec2 describe-images --image-ids $IMAGE_ID | jq -r '.Images[0].State') = "available" ]
+	do
+	  sleep 5
+	  echo "Waiting for image $IMAGE_ID"
+	done
+	aws ec2 create-tags --resources $IMAGE_ID --tags Key=Name,Value=$ec2spotter_image_name
+else
+	echo "Re-using image with id=$IMAGE_ID"
+fi
 
 REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/.$//')
 PUB_KEY=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
@@ -61,7 +66,7 @@ cat >specs.tmp <<EOF
     {
       "DeviceName" : "/dev/sda1",
       "Ebs": {
-        "VolumeSize": 8,
+        "VolumeSize": $ec2spotter_volume_size,
         "DeleteOnTermination": true,
         "VolumeType" : "gp2"
       }
