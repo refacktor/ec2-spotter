@@ -10,7 +10,7 @@ spotId=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' < spot.tmp)
 
 state=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $spotId | jq -r '.SpotInstanceRequests[0].State')
 
-if [ ! "$state" = "xactive" ]
+if [ ! "$state" = "active" ]
 then
   # reclaim the public IP address
   my_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
