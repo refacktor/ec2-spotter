@@ -37,7 +37,7 @@ my_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 aws ec2 create-tags --resources \$my_id --tags Key=Name,Value="${ec2spotter_image_name}-spot"
 
 echo $HOSTNAME > /etc/hostname
-echo "aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation"|at now + 3 minutes
+echo "aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation"|at now + 5 minutes
 shutdown -r now
 
 EOF

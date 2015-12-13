@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cd `dirname $0`
+. ./$(hostname -s).conf || exit 1
+
+# healthcheck is only done if we are not the primary
+./primary && exit 0
+
+spotId=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' < spot.tmp)
+
+state=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $spotId | jq -r '.SpotInstanceRequests[0].State')
+
+if [ ! "$state" = "xactive" ]
+then
+  # reclaim the public IP address
+  my_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+  aws ec2 associate-address --instance-id $my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation
+fi
