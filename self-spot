@@ -1,0 +1,25 @@
+#!/bin/sh
+# script that runs on the spot instance to watch itself.
+# this provides a faster fail-over under normal scenarios.
+
+if ! [ -f /var/run/ec2spotter ]
+then
+	# safety check - I'm not the spot instance!
+	exit 1
+fi
+
+until curl -s http://169.254.169.254/latest/meta-data/spot/termination-time | grep -q .*T.*Z
+do
+	sleep 5
+done
+
+cd `dirname $0`
+. ./$(hostname -s).conf || exit 1
+
+controlId=$(cat /var/run/ec2spotter)
+
+# give back the public IP address to the control instance
+aws ec2 associate-address --instance-id $controlId --allocation-id $ec2spotter_elastic_ip --allow-reassociation
+
+# according to AWS documentation the termination could be cancelled
+echo poweroff | at now + 3 minutes

@@ -1,11 +1,12 @@
 #!/bin/bash
 
 if [ "$1" = "" ]; then echo "USER ERROR: please specify a configuration file"; exit -1; fi
+DIR=$(dirname $0)
 PATH=.:$PATH . $1 || exit -1
 
 if [ "$ec2spotter_image_name" = "" ]
 then
-  echo "image not specified";
+  echo "image name not specified";
   exit -1;
 fi
 
@@ -13,21 +14,22 @@ SELF=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 IMAGE_ID=$(aws ec2 describe-images --filters Name=tag-key,Values="Name" Name=tag-value,Values=$ec2spotter_image_name --owners self \
    |jq -r '.Images[0].ImageId')
 
-if [ "$IMAGE_ID" = "null" ]
+if [ $IMAGE_ID != "null" ] && [ $IMAGE_ID != "" ]
 then
-	echo "Creating AMI image."
-	IMAGE_ID=$(aws ec2 create-image --instance-id $SELF --no-reboot --name $ec2spotter_image_name | jq -r '.ImageId')
-	while [ ! $(aws ec2 describe-images --image-ids $IMAGE_ID | jq -r '.Images[0].State') = "available" ]
-	do
-	  sleep 5
-	  echo "Waiting for image $IMAGE_ID"
-	done
-	aws ec2 create-tags --resources $IMAGE_ID --tags Key=Name,Value=$ec2spotter_image_name
+	aws ec2 deregister-image --image-id $IMAGE_ID
 fi
+
+echo "Creating AMI image."
+IMAGE_ID=$(aws ec2 create-image --instance-id $SELF --no-reboot --name $ec2spotter_image_name | jq -r '.ImageId')
+while [ ! $(aws ec2 describe-images --image-ids $IMAGE_ID | jq -r '.Images[0].State') = "available" ]
+do
+  sleep 5
+  echo "Waiting for image $IMAGE_ID"
+done
+aws ec2 create-tags --resources $IMAGE_ID --tags Key=Name,Value=$ec2spotter_image_name
 
 REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/.$//')
 PUB_KEY=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
-
 HOSTNAME=$(hostname)
 
 # Setup the script that runs in the spot instance. It is responsible for cleaning up the temporary objects created during launch.
@@ -36,8 +38,13 @@ cat >user-data.tmp <<EOF
 my_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 aws ec2 create-tags --resources \$my_id --tags Key=Name,Value="${ec2spotter_image_name}-spot"
 
+echo '@reboot $DIR/self-spot' > /tmp/crontab
+crontab -l >> /tmp/crontab
+crontab < /tmp/crontab
+
+echo $SELF > /var/run/ec2spotter
 echo $HOSTNAME > /etc/hostname
-echo "aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation"|at now + 5 minutes
+echo "aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation; aws ec2 associate-address --instance-id $SELF --allocation-id $ec2spotter_control_ip --allow-reassociation" | at now + 5 minutes
 shutdown -r now
 
 EOF

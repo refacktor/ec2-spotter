@@ -1,18 +1,20 @@
 #!/bin/sh
+# script that runs on the permanent control host to reclaim IP address when spot instance dies.
+
+if [ -f /var/run/ec2spotter ]
+then
+	# safety check - I'm not the control, I'm the spot instance!
+	exit 0
+fi
 
 cd `dirname $0`
 . ./$(hostname -s).conf || exit 1
 
-# healthcheck is only done if we are not the primary
-./primary && exit 0
+ipOwner=$(aws ec2 describe-addresses --allocation-ids $ec2spotter_elastic_ip | jq -r '.Addresses[0].InstanceId')
+self=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 
-spotId=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' < spot.tmp)
-
-state=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $spotId | jq -r '.SpotInstanceRequests[0].State')
-
-if [ ! "$state" = "active" ]
+if [ $ipOwner = "" ]
 then
-  # reclaim the public IP address
-  my_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-  aws ec2 associate-address --instance-id $my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation
+	# reclaim the public IP address
+	aws ec2 associate-address --instance-id $self --allocation-id $ec2spotter_elastic_ip --allow-reassociation
 fi

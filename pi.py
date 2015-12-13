@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# A quick benchmark to check the health of EC2 instance.
+# A quick benchmark to check the CPU power of a machine.
 #
 # http://en.literateprograms.org/Pi_with_Machin's_formula_%28Python%29
 
