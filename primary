@@ -12,6 +12,6 @@ then
   #echo $self is primary for $ec2spotter_elastic_ip
   exit 0
 else
-  exit -1
+  exit 1
 fi
 

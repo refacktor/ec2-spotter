@@ -28,16 +28,18 @@ fi
 REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/.$//')
 PUB_KEY=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
 
+HOSTNAME=$(hostname)
+
 # Setup the script that runs in the spot instance. It is responsible for cleaning up the temporary objects created during launch.
 cat >user-data.tmp <<EOF
 #!/bin/sh
 my_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-aws ec2 create-tags --resources $my_id --tags Key=Name,Value="${ec2spotter_image_name}"
+aws ec2 create-tags --resources \$my_id --tags Key=Name,Value="${ec2spotter_image_name}-spot"
 
-sleep 120
-aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation
+echo $HOSTNAME > /etc/hostname
+echo "aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation"|at now + 3 minutes
+shutdown -r now
 
-echo "Spot Instance up and running." | mail root
 EOF
 
 userData=$(base64 user-data.tmp | tr -d '\n');
