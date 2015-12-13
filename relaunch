@@ -1,0 +1,70 @@
+#!/bin/bash
+
+if [ "$1" = "" ]; then echo "USER ERROR: please specify a configuration file"; exit -1; fi
+PATH=.:$PATH . $1 || exit -1
+
+if [ "$ec2spotter_image_name" = "" ]
+then
+  echo "image not specified";
+  exit -1;
+fi
+
+IMAGE_ID=$(aws ec2 describe-images --filters Name=tag-key,Values="Name" Name=tag-value,Values=$ec2spotter_image_name --owners self |jq -r 'Images[0].ImageId')
+
+if [ "$IMAGE" = "" ]
+then
+  .. add code here to create image
+  exit 1;
+	while [ ! $(aws ec2 describe-images --image-ids $IMAGE | jq -r '.Images[0].State') = "available" ]
+	do
+	  sleep 5
+	  echo "Waiting for image $IMAGE_ID"
+	done
+fi
+
+REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/.$//')
+PUB_KEY=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
+
+# Setup the script that runs in the spot instance. It is responsible for cleaning up the temporary objects created during launch.
+cat >user-data.tmp <<EOF
+#!/bin/sh
+my_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+aws ec2 create-tags --resources $my_id --tags Key=Name,Value="${ec2spotter_image_name}"
+
+rm /var/lib/tomcat7/webapps/map.war
+rm /var/lib/tomcat7/webapps/data.war
+
+aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation
+
+echo "Spot Instance up and running." | mail root
+EOF
+
+userData=$(base64 user-data.tmp | tr -d '\n');
+
+cat >specs.tmp <<EOF
+{
+  "KeyName" : "$PUB_KEY",
+  "InstanceType": "$ec2spotter_instance_type",
+  "ImageId" : "$IMAGE_ID",
+  "UserData" : "${userData}",
+  "BlockDeviceMappings": [
+    {
+      "DeviceName" : "/dev/sda1",
+      "Ebs": {
+        "VolumeSize": 8,
+        "DeleteOnTermination": true,
+        "VolumeType" : "gp2"
+      }
+    }
+  ]
+}
+EOF
+
+aws ec2 request-spot-instances --spot-price $ec2spotter_bid_price --type one-time --launch-specification file://specs.tmp --region ${REGION} > spot.tmp
+
+SPOT_ID=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' spot.tmp)
+
+echo SPOT_ID=$SPOT_ID
+
+aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ec2spotter_image_name} --region ${REGION}
+
