@@ -47,7 +47,7 @@ echo '@reboot $DIR/self-spot' > /tmp/crontab
 crontab -l >> /tmp/crontab
 crontab < /tmp/crontab
 
-echo $SELF > /var/run/ec2spotter
+echo $SELF > /etc/ec2spotter
 echo $HOSTNAME > /etc/hostname
 echo "aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation; aws ec2 associate-address --instance-id $SELF --allocation-id $ec2spotter_control_ip --allow-reassociation" | at now + 5 minutes
 shutdown -r now

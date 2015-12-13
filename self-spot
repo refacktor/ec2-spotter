@@ -2,7 +2,7 @@
 # script that runs on the spot instance to watch itself.
 # this provides a faster fail-over under normal scenarios.
 
-if ! [ -f /var/run/ec2spotter ]
+if ! [ -f /etc/ec2spotter ]
 then
 	# safety check - I'm not the spot instance!
 	exit 1
@@ -16,7 +16,7 @@ done
 cd `dirname $0`
 . ./$(hostname -s).conf || exit 1
 
-controlId=$(cat /var/run/ec2spotter)
+controlId=$(cat /etc/ec2spotter)
 
 # give back the public IP address to the control instance
 aws ec2 associate-address --instance-id $controlId --allocation-id $ec2spotter_elastic_ip --allow-reassociation
