@@ -21,6 +21,7 @@ if [ $ipOwner = "" ]
 then
 	# reclaim the public IP address
 	aws ec2 associate-address --instance-id $self --allocation-id $ec2spotter_elastic_ip --allow-reassociation
+	echo "Elastic IP $ec2spotter_elastic_ip reclaimed to instance $self"
 fi
 
 #
