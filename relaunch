@@ -9,17 +9,20 @@ then
   exit -1;
 fi
 
-IMAGE_ID=$(aws ec2 describe-images --filters Name=tag-key,Values="Name" Name=tag-value,Values=$ec2spotter_image_name --owners self |jq -r 'Images[0].ImageId')
+SELF=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+IMAGE_ID=$(aws ec2 describe-images --filters Name=tag-key,Values="Name" Name=tag-value,Values=$ec2spotter_image_name --owners self \
+   |jq -r '.Images[0].ImageId')
 
-if [ "$IMAGE" = "" ]
+if [ "$IMAGE_ID" = "null" ]
 then
-  .. add code here to create image
-  exit 1;
-	while [ ! $(aws ec2 describe-images --image-ids $IMAGE | jq -r '.Images[0].State') = "available" ]
+	echo "Creating AMI image."
+	IMAGE_ID=$(aws ec2 create-image --instance-id $SELF --no-reboot --name $ec2spotter_image_name | jq -r '.ImageId')
+	while [ ! $(aws ec2 describe-images --image-ids $IMAGE_ID | jq -r '.Images[0].State') = "available" ]
 	do
 	  sleep 5
 	  echo "Waiting for image $IMAGE_ID"
 	done
+	aws ec2 create-tags --resources $IMAGE_ID --tags Key=Name,Value=$ec2spotter_image_name
 fi
 
 REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/.$//')
@@ -31,9 +34,7 @@ cat >user-data.tmp <<EOF
 my_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 aws ec2 create-tags --resources $my_id --tags Key=Name,Value="${ec2spotter_image_name}"
 
-rm /var/lib/tomcat7/webapps/map.war
-rm /var/lib/tomcat7/webapps/data.war
-
+sleep 120
 aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation
 
 echo "Spot Instance up and running." | mail root

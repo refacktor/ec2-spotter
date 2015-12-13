@@ -1,0 +1,17 @@
+#!/bin/sh
+
+cd `dirname $0`
+. ./$(hostname -s).conf || exit 1
+
+self=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+
+alloc=$(aws ec2 describe-addresses --allocation-ids $ec2spotter_elastic_ip | jq -r '.Addresses[0].InstanceId')
+
+if [ $self = $alloc ]
+then
+  #echo $self is primary for $ec2spotter_elastic_ip
+  exit 0
+else
+  exit -1
+fi
+
