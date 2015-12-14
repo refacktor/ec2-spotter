@@ -48,6 +48,8 @@ AWSSecretKey=XXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # How does it work?
 
+*** the master branch is undergoing a rewrite, the description below corresponds to the 'classic' version which is in a different git branch ***
+
 The launch script employs user-data to create a boot-time script that attaches the 
 specified EBS volume to `/dev/xvdf` and then proceeds to do a `pivot_root` and `chroot` in order to use  it as 
 the main system disk in place of `/dev/xvda`. When the instance is first created or restarted following an interruption,

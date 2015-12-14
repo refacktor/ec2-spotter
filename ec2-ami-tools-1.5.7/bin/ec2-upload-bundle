@@ -1,7 +1,0 @@
-#!/bin/bash
-
-[ -e ${EC2_AMITOOL_HOME:=${EC2_HOME}}/lib/ec2/amitools/uploadbundle.rb ] \
-    || EC2_AMITOOL_HOME=$(dirname $(dirname $(readlink -e $0)))
-export EC2_AMITOOL_HOME
-ruby -I ${EC2_AMITOOL_HOME}/lib \
-    ${EC2_AMITOOL_HOME}/lib/ec2/amitools/uploadbundle.rb "$@"

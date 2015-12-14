@@ -1,9 +1,0 @@
-eu-west-1,us-east-1,manifest
-ari-6b0d251f,ari-a23adfcb,initrd-2.6.20-1.3002.fc6xen.ari.manifest.xml
-ari-7f0d250b,ari-b31cf9da,ec2-initrd-2.6.21.7-2.fc8xen.x86_64.manifest.xml
-aki-6a0d251e,aki-a53adfcc,vmlinuz-2.6.20-1.3002.fc6xen.aki.manifest.xml
-aki-550d2521,aki-9800e5f1,vmlinuz-2.6.18-xenU-ec2-v1.0.x86_64.aki.manifest.xml
-aki-780d250c,aki-b51cf9dc,ec2-vmlinuz-2.6.21.7-2.fc8xen.x86_64.manifest.xml
-ari-7d0d2509,ari-a51cf9cc,ec2-initrd-2.6.21.7-2.fc8xen.i386.manifest.xml
-aki-540d2520,aki-9b00e5f2,vmlinuz-2.6.18-xenU-ec2-v1.0.i386.aki.manifest.xml
-aki-7e0d250a,aki-a71cf9ce,ec2-vmlinuz-2.6.21.7-2.fc8xen.i386.manifest.xml
