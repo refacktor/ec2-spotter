@@ -57,12 +57,17 @@ EOF
 
 userData=$(base64 user-data.tmp | tr -d '\n');
 
+cheapZone=$(aws ec2 describe-spot-price-history --product-descriptions Linux/UNIX --instance-types $ec2spotter_instance_type --max-items 10|jq -r '.SpotPriceHistory'|jq -r 'sort_by(.SpotPrice)[0].AvailabilityZone')
+
 cat >specs.tmp <<EOF
 {
   "KeyName" : "$PUB_KEY",
   "InstanceType": "$ec2spotter_instance_type",
   "ImageId" : "$IMAGE_ID",
   "UserData" : "${userData}",
+  "Placement": {
+    "AvailabilityZone": "$cheapZone"
+  },
   "BlockDeviceMappings": [
     {
       "DeviceName" : "/dev/sda1",
