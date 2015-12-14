@@ -22,6 +22,7 @@ fi
 if [ "$ec2spotter_reuse_images" != 1 ]
 then
 	echo "Creating AMI image."
+	sync
 	IMAGE_ID=$(aws ec2 create-image --instance-id $SELF --no-reboot --name $ec2spotter_image_name | jq -r '.ImageId')
 	while [ ! $(aws ec2 describe-images --image-ids $IMAGE_ID | jq -r '.Images[0].State') = "available" ]
 	do
