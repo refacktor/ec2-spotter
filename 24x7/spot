@@ -7,17 +7,20 @@ then
 	exit 0
 fi
 
-cd `dirname $0`
-. ./$(hostname -s).conf || exit 1
+PATH=/usr/local/bin/:$PATH
+
+cd $(dirname $0)
+CONF=$(hostname -s).conf
+. ./$CONF || exit 1
 
 #
 # First check if the IP address needs to be reclaimed. This could happen if the spot instance had a sudden failure.
 #
 
-ipOwner=$(aws ec2 describe-addresses --allocation-ids $ec2spotter_elastic_ip | jq -r '.Addresses[0].InstanceId')
-self=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+ipOwner=$(aws ec2 describe-addresses --allocation-ids $ec2spotter_elastic_ip | jq -r '.Addresses[0].InstanceId') &&
+self=$(curl -s http://169.254.169.254/latest/meta-data/instance-id) &&
 
-if [ $ipOwner = "" ]
+if [ "$ipOwner" = "null" ] || [ "$ipOwner" = "" ]
 then
 	# reclaim the public IP address
 	aws ec2 associate-address --instance-id $self --allocation-id $ec2spotter_elastic_ip --allow-reassociation
@@ -34,9 +37,9 @@ then
 
 	if [ ! "$state" = "active" ] && [ ! "$state" = "open" ]
 	then
-		echo self=$self oldSpotId=$spotId state=$state $(hostname) | mail -s "relaunching spot instance" root
-		rm -f spot.tmp # remove to avoid weird loops and race conditions
-		./relaunch
+		echo self=$self oldSpotId=$spotId state=$state $(hostname)
+		mv -f spot.tmp spot.tmp-old # remove to avoid weird loops and race conditions
+		./relaunch $CONF
 	fi
 fi
 

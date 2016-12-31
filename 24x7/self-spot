@@ -8,6 +8,8 @@ then
 	exit 1
 fi
 
+PATH=/usr/local/bin/:$PATH
+
 until curl -s http://169.254.169.254/latest/meta-data/spot/termination-time | grep -q .*T.*Z
 do
 	sleep 5
@@ -18,8 +20,10 @@ cd `dirname $0`
 
 controlId=$(cat /etc/ec2spotter)
 
+echo "Self-spotted termination warning received for instance=$controlId eip=$ec2spotter_elastic_ip" >&2
+
 # give back the public IP address to the control instance
 aws ec2 associate-address --instance-id $controlId --allocation-id $ec2spotter_elastic_ip --allow-reassociation
 
 # according to AWS documentation the termination could be cancelled
-echo poweroff | at now + 3 minutes
+echo /sbin/poweroff | at now + 5 minutes

@@ -17,8 +17,12 @@ the simplicity (persistent EBS filesystem) of On Demand & Reserved Instances. Th
 
 # Running ec2-spotter
 
-The 24x7 version works differently from the 'classic' version, so check the respective sub-directory.
+The '24x7' version works differently from the 'classic' version, so check the respective sub-directory.
 
 # How does it work?
 
 See above.
+
+# Which one should I use?
+
+The '24x7' is in Production use at CTC. The 'classic' version was tested but never went live.

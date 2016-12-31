@@ -1,0 +1,60 @@
+#!/bin/bash -e
+
+MetaCall="curl -s http://169.254.169.254/latest/meta-data"
+
+SELF_ID=$($MetaCall/instance-id)
+INSTANCE_TYPE=$($MetaCall/instance-type)
+SECGRP_NAME=$($MetaCall/security-groups/)
+SECGRP_ID=$(aws ec2 describe-security-groups --group-names $SECGRP_NAME | jq -r '.SecurityGroups[0].GroupId')
+SUBNET_ID=$($MetaCall/network/interfaces/macs/$($MetaCall/mac)/subnet-id)
+NAME=$(hostname -s)
+HOSTNAME=$(hostname)
+
+IMAGE_ID=$(aws ec2 describe-images --filters Name=tag-key,Values="Name" Name=tag-value,Values=$NAME --owners self \
+   |jq -r '.Images[0].ImageId')
+
+if [ $IMAGE_ID = null ]
+then
+	echo "Creating AMI image."
+	sync
+	IMAGE_ID=$(aws ec2 create-image --instance-id $SELF_ID --no-reboot --name $NAME | jq -r '.ImageId')
+	while [ ! $(aws ec2 describe-images --image-ids $IMAGE_ID | jq -r '.Images[0].State') = "available" ]
+	do
+	  sleep 5
+	  echo "Waiting for image $IMAGE_ID"
+	done
+else
+	echo "Re-using image $IMAGE_ID which has the same Name Tag"
+fi
+
+# tag the image's snapshot
+SNAPSHOT_ID=$(aws ec2 describe-images --image-id $IMAGE_ID |jq -r '.Images[0].BlockDeviceMappings[0].Ebs.SnapshotId')
+aws ec2 create-tags --resources $IMAGE_ID $SNAPSHOT_ID --tags Key=Name,Value=$NAME
+
+REGION=$($MetaCall/placement/availability-zone | sed -e 's/.$//')
+KEY_NAME=$(wget -q -O - http://169.254.169.254/latest/meta-data/public-keys | awk -F= '{print $2}')
+
+# Setup the script that runs in the spot instance. It is responsible for cleaning up the temporary objects created during launch.
+cat >user-data.tmp <<EOF
+#!/bin/sh
+my_id=\$($MetaCall/instance-id)
+my_root_vol_id=\$(aws ec2 describe-instances --instance-id \$my_id | jq -r '.Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId')
+
+crontab -l > /root/saved-crontab
+crontab < /dev/null
+
+echo $HOSTNAME > /etc/hostname
+hostname $HOSTNAME
+reboot
+EOF
+
+aws ec2 run-instances --image-id $IMAGE_ID --count 1 --instance-type $INSTANCE_TYPE --key-name $KEY_NAME \
+	--security-group-ids $SECGRP_ID --subnet-id $SUBNET_ID --user-data "$(cat ./user-data.tmp)" > instance.tmp
+
+NEW_INSTANCE_ID=$(jq -r '.Instances[0].InstanceId' < instance.tmp)
+
+aws ec2 create-tags --resources $NEW_INSTANCE_ID --tags Key=Name,Value="$NAME(clone)" --region $REGION
+aws ec2 create-tags --resources $NEW_INSTANCE_ID --tags Key=hostname,Value=$HOSTNAME --region $REGION
+
+echo "Instance launched: $NEW_INSTANCE_ID"
+

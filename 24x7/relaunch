@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PATH=/usr/local/bin/:$PATH
+
 if [ "$1" = "" ]; then echo "USER ERROR: please specify a configuration file"; exit -1; fi
 DIR=$(readlink -m $(dirname $0))
 PATH=.:$PATH . $1 || exit -1
@@ -29,7 +31,8 @@ then
 	  sleep 5
 	  echo "Waiting for image $IMAGE_ID"
 	done
-	aws ec2 create-tags --resources $IMAGE_ID --tags Key=Name,Value=$ec2spotter_image_name
+	SNAPSHOT_ID=$(aws ec2 describe-images --image-id $IMAGE_ID |jq -r '.Images[0].BlockDeviceMappings[0].Ebs.SnapshotId')
+	aws ec2 create-tags --resources $IMAGE_ID $SNAPSHOT_ID --tags Key=Name,Value=$ec2spotter_image_name
 else
 	echo "Re-using image with id=$IMAGE_ID"
 fi
@@ -42,7 +45,8 @@ HOSTNAME=$(hostname)
 cat >user-data.tmp <<EOF
 #!/bin/sh
 my_id=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-aws ec2 create-tags --resources \$my_id --tags Key=Name,Value="${ec2spotter_image_name}-spot"
+my_root_vol_id=\$(aws ec2 describe-instances --instance-id \$my_id | jq -r '.Reservations[0].Instances[0].BlockDeviceMappings[0].Ebs.VolumeId')
+aws ec2 create-tags --resources \$my_id \$my_root_vol_id --tags Key=Name,Value="${ec2spotter_image_name}-spot"
 
 echo '@reboot $DIR/self-spot' > /tmp/crontab
 crontab -l >> /tmp/crontab
@@ -50,14 +54,21 @@ crontab < /tmp/crontab
 
 echo $SELF > /etc/ec2spotter
 echo $HOSTNAME > /etc/hostname
-echo "aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation; aws ec2 associate-address --instance-id $SELF --allocation-id $ec2spotter_control_ip --allow-reassociation" | at now + 5 minutes
+echo "echo Launching new spot instance: \$my_id $ec2spotter_elastic_ip, spotted by: $SELF $ec2spotter_control_ip; aws ec2 associate-address --instance-id \$my_id --allocation-id $ec2spotter_elastic_ip --allow-reassociation; aws ec2 associate-address --instance-id $SELF --allocation-id $ec2spotter_control_ip --allow-reassociation" | at now + 5 minutes
 shutdown -r now
 
 EOF
 
 userData=$(base64 user-data.tmp | tr -d '\n');
 
-cheapZone=$(aws ec2 describe-spot-price-history --product-descriptions Linux/UNIX --instance-types $ec2spotter_instance_type --max-items 10|jq -r '.SpotPriceHistory'|jq -r 'sort_by(.SpotPrice)[0].AvailabilityZone')
+sortedPrices=$(aws ec2 describe-spot-price-history --product-descriptions Linux/UNIX --instance-types $ec2spotter_instance_type --max-items 25 | jq -r '.SpotPriceHistory | sort_by(.SpotPrice)')
+
+medianPrice=$(echo $sortedPrices| jq -r '.[18].SpotPrice')
+cheapZone=$(echo $sortedPrices | jq -r '.[0].AvailabilityZone')
+
+echo "Selected medianPrice=$medianPrice in zone $cheapZone" >&2
+echo "Absolute lowest price was " $(echo $sortedPrices| jq -r '.[0].SpotPrice') >&2
+echo "Absolute highest price was " $(echo $sortedPrices| jq -r '.[24].SpotPrice') >&2
 
 cat >specs.tmp <<EOF
 {
@@ -81,11 +92,19 @@ cat >specs.tmp <<EOF
 }
 EOF
 
-aws ec2 request-spot-instances --spot-price $ec2spotter_bid_price --type one-time --launch-specification file://specs.tmp --region ${REGION} > spot.tmp
+targetPrice=$medianPrice
+#if [ $targetPrice -gt $ec2spotter_bid_price ]
+#then
+#	targetPrice=$ec2spotter_bid_price
+#	echo "targetPrice capped at $ec2spotter_bid_price" >&2
+#fi
 
-SPOT_ID=$(jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId' spot.tmp)
+SPOT_JSON=$(aws ec2 request-spot-instances --spot-price $targetPrice --type one-time --launch-specification file://specs.tmp --region ${REGION})
+
+SPOT_ID=$(echo $SPOT_JSON | jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId')
 
 echo SPOT_ID=$SPOT_ID
 
 aws ec2 create-tags --resources ${SPOT_ID} --tags Key=Name,Value=${ec2spotter_image_name} --region ${REGION}
 
+echo $SPOT_JSON > spot.tmp
