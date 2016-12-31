@@ -13,8 +13,8 @@ This code was in production use for a while at CTC.
 2. Install prereqs: AWS CLI and jq
 
 3. Setup two crontab entries on the base machine:
-* * * * * [ -f /etc/ec2spotter ] || spot /root/ec2-spotter/example.conf  
-* * * * * [ -f /etc/ec2spotter ] && self-spot /root/ec2-spotter/example.conf  
+	* * * * * [ -f /etc/ec2spotter ] || spot /root/ec2-spotter/example.conf  
+	* * * * * [ -f /etc/ec2spotter ] && self-spot /root/ec2-spotter/example.conf  
 
 The reason you need two crontab entries is that they will run on both the base (reserved) and the cloned (spot) machines, but need to do something different in each (spot the other instance, or spot itself).
 
