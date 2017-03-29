@@ -122,7 +122,8 @@ fi
 echo ""
 echo "Attaching volume $PERSISTENT_ROOT_VOLUME as /dev/sdf"
 # Attach volume
-${APIBIN}/ec2-attach-volume $PERSISTENT_ROOT_VOLUME -d /dev/sdf --instance $INSTANCE_ID || exit -1
+aws ec2 attach-volume --volume-id $PERSISTENT_ROOT_VOLUME --instance-id $INSTANCE_ID --device /dev/sdf
+# ${APIBIN}/ec2-attach-volume $PERSISTENT_ROOT_VOLUME -d /dev/sdf --instance $INSTANCE_ID || exit -1
 
 while ! lsblk /dev/xvdf
 do
