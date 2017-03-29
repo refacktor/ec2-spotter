@@ -30,7 +30,7 @@ export ARCH=`uname -i`
 export INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
 export SPOT_ZONE=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
 export SPOT_REGION=${SPOT_ZONE::-1} # Get the region by stripping the last character of the ROOT_ZONE
-
+export AWS_DEFAULT_REGION=$SPOT_REGION
 ROOT_REGION=$SPOT_REGION # By default, we're in the same region
 #ROOT_ZONE=$SPOT_ZONE
 
