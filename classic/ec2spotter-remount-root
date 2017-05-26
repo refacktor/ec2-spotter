@@ -30,7 +30,7 @@ export ARCH=`uname -i`
 export INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
 export SPOT_ZONE=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
 export SPOT_REGION=${SPOT_ZONE::-1} # Get the region by stripping the last character of the ROOT_ZONE
-
+export AWS_DEFAULT_REGION=$SPOT_REGION
 ROOT_REGION=$SPOT_REGION # By default, we're in the same region
 #ROOT_ZONE=$SPOT_ZONE
 
@@ -122,7 +122,8 @@ fi
 echo ""
 echo "Attaching volume $PERSISTENT_ROOT_VOLUME as /dev/sdf"
 # Attach volume
-${APIBIN}/ec2-attach-volume $PERSISTENT_ROOT_VOLUME -d /dev/sdf --instance $INSTANCE_ID || exit -1
+aws ec2 attach-volume --volume-id $PERSISTENT_ROOT_VOLUME --instance-id $INSTANCE_ID --device /dev/sdf
+# ${APIBIN}/ec2-attach-volume $PERSISTENT_ROOT_VOLUME -d /dev/sdf --instance $INSTANCE_ID || exit -1
 
 while ! lsblk /dev/xvdf
 do
