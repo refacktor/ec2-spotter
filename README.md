@@ -17,12 +17,13 @@ the simplicity (persistent EBS filesystem) of On Demand & Reserved Instances. Th
 
 # Running ec2-spotter
 
-The '24x7' version works differently from the 'classic' version, so check the respective sub-directory.
+The '24x7' implementation works differently from the 'classic' implementation, so check the README in the respective sub-directory.
 
 # How does it work?
 
-See above.
+Each of the implementations works differently, so check the README in the respective sub-directory.
 
 # Which one should I use?
 
-The '24x7' is in Production use at CTC. The 'classic' version was tested but never went live.
+- The 'classic' implementation is the one that fully solves the stated problem of root volume persistance, and it should be used for applications that require maximum statefulness but can tolerate occasional down-time, e.g. build servers, experimental or Proof Of Concept enviroments, automated continuous integration, hands-on dev servers, ETL servers, asynchronous processes, batch processing servers in general, and database.
+- The '24x7' implementation gives up some of the root volume persistence, in exchange for 24x7 availability. It is for applications that have stateful configuration but no critical stateful data. This option is adequate for typical Internet-facing web app servers in Production, if your database is remote and you can redirect your application logs to a remote location.
