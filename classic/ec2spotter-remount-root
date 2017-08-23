@@ -161,7 +161,8 @@ for dir in /dev /proc /sys /run; do
     echo "Moving mounted file system ${OLDMNT}\${dir} to \$dir."
     mount --move ./${OLDMNT}\${dir} \${dir}
 done
-exec chroot . /sbin/init
+exec chroot . /sbin/init.backup
 EOF
 chmod +x /sbin/init
+chmod +x /sbin/init.backup
 shutdown -r now
