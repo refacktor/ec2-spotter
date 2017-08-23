@@ -153,20 +153,19 @@ if [ -L "/sbin/init" ]
 then
    mv /sbin/init /sbin/init.backup
    cat >/sbin/init <<EOF
-   #!/bin/sh
-   mount $DEVICE $NEWMNT
-   [ ! -d $NEWMNT/$OLDMNT ] && mkdir -p $NEWMNT/$OLDMNT
+#!/bin/sh
+mount $DEVICE $NEWMNT
+[ ! -d $NEWMNT/$OLDMNT ] && mkdir -p $NEWMNT/$OLDMNT
    
-   cd $NEWMNT
-   pivot_root . ./$OLDMNT
+cd $NEWMNT
+pivot_root . ./$OLDMNT
    
-   for dir in /dev /proc /sys /run; do
-       echo "Moving mounted file system ${OLDMNT}\${dir} to \$dir."
-       mount --move ./${OLDMNT}\${dir} \${dir}
-   done
-   exec chroot . /sbin/init.backup
+for dir in /dev /proc /sys /run; do
+   echo "Moving mounted file system ${OLDMNT}\${dir} to \$dir."
+   mount --move ./${OLDMNT}\${dir} \${dir}
+done
+exec chroot . /sbin/init.backup
 EOF
    chmod +x /sbin/init
-   chmod +x /sbin/init.backup
    shutdown -r now
 fi
