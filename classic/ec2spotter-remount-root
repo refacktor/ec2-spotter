@@ -140,6 +140,7 @@ fi
 DEVICE=/dev/xvdf1
 NEWMNT=/permaroot
 OLDMNT=old-root
+e2fsck $DEVICE -y
 e2label $DEVICE permaroot
 tune2fs $DEVICE -U `uuidgen`
 mkdir $NEWMNT
