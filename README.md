@@ -28,3 +28,7 @@ Each of the implementations works differently, so check the README in the respec
 
 - The 'classic' implementation is the one that fully solves the stated problem of root volume persistance, and it should be used for applications that require maximum statefulness but can tolerate occasional down-time, e.g. build servers, experimental or Proof Of Concept enviroments, automated continuous integration, hands-on dev servers, ETL servers, asynchronous processes, batch processing servers in general. Database servers can also be run on 'ec2-spotter classic' as long as they are supporting applications that can tolerate occasional down-time.
 - The '24x7' implementation gives up some of the root volume persistence, in exchange for 24x7 availability. It is for applications that have stateful configuration but create no critical run-time data. This option is adequate for typical Internet-facing web app servers in Production, if your database is remote and you can redirect your application logs to a remote location. It's also ok for caching servers.
+
+# Notable Forks
+
+If you have any issues with the 'classic' implementation, check out Slav Ivanov's fork at https://github.com/slavivanov/ec2-spotter - it is fully productionalized, including more exhaustive documentation and active discussion at his blog, while removing support for the '24x7' concept. 
