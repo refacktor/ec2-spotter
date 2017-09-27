@@ -1,3 +1,11 @@
+# Important News - 9/18/2017
+
+Amazon EC2 Spot Can Now Stop and Start Your Spot Instances!
+
+https://aws.amazon.com/about-aws/whats-new/2017/09/amazon-ec2-spot-can-now-stop-and-start-your-spot-instances/
+
+As a result ec2-spotter (this project) is now obsolete!
+
 # About AWS EC2 Spot Instances
 
 EC2 Spot Instances are cheaper than On Demand instances and even Reserved Instances.
