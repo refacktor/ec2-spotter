@@ -40,3 +40,7 @@ Each of the implementations works differently, so check the README in the respec
 # Notable Forks
 
 If you have any issues with the 'classic' implementation, check out Slav Ivanov's fork at https://github.com/slavivanov/ec2-spotter - it is fully productionalized, including more exhaustive documentation and active discussion at his blog, while removing support for the '24x7' concept. 
+
+# Commercial Alternatives
+
+ElastiGroup (https://spotinst.com/products/elastigroup/) appears to cover a lot of the same ground as ec2spotter, and more, in a commercial offering. We have no relationship with the company offering ElastiGroup, and have not evaluated their product.
