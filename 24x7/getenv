@@ -1,5 +1,0 @@
-export EC2_INSTANCE_ID=$(curl --silent http://169.254.169.254/latest/meta-data/instance-id)
-export EC2_CONFIG_TAG=$(/usr/local/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=$EC2_INSTANCE_ID" |
-             jq -r '.Tags[] | select(.Key=="config") | .Value')
-
-export CTC_CONFIG_PATH=file:///home/ctcgit/ctc_deploy/Chicago_Top_Condos/config/$EC2_CONFIG_TAG

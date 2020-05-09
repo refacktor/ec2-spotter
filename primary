@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# Check whether the machine we're running in is the one holding the Elastic IP.
+# This actually is not used by ec2-spotter, but is provided for troubleshooting. 
+#
 
 cd `dirname $0`
 . ./$(hostname -s).conf || exit 1
@@ -11,9 +15,10 @@ alloc=$(aws ec2 describe-addresses --allocation-ids $ec2spotter_elastic_ip | jq 
 
 if [ $self = $alloc ]
 then
-  #echo $self is primary for $ec2spotter_elastic_ip
+  echo $self is primary for $ec2spotter_elastic_ip
   exit 0
 else
+  echo $self is NOT PRIMARY for $ec2spotter_elastic_ip
   exit 1
 fi
 

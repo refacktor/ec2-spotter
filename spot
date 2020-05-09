@@ -1,5 +1,6 @@
 #!/bin/sh
 # script that runs on the permanent control host to reclaim IP address when spot instance dies.
+# This is really just a backstop in case the spot instance doesn't voluntarily reassign it before dying.
 
 if [ -f /etc/ec2spotter ]
 then

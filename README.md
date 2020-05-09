@@ -1,46 +1,46 @@
-# Important News - 9/18/2017
+# ec2-spotter 24x7
 
-Amazon EC2 Spot Can Now Stop and Start Your Spot Instances!
+This folder contains the "24x7" High Availability version of ec2-spotter, which differs in both goals and implementation from the obsolete "classic" version.
 
-https://aws.amazon.com/about-aws/whats-new/2017/09/amazon-ec2-spot-can-now-stop-and-start-your-spot-instances/
+This setup provides mostly uninterrupted availability by automatically failing over between a (cheap) reserved instance and a (powerful) spot instance, automatically managing Elastic IP Address reassignment as well as re-cloning the primary node every time a new spot instance is launched (to cut down on maintenance chores on applications that are not fully CI/CD'd). 
 
-The change is welcome but does not render ec2-spotter completely obsolete: use this project if you want more control over the starts and stops.
+This configuration is good for web or other servers which need to be up 24x7 but can tolerate a performance hit during a spot instance roll-over and do not keep critical dynamic information on the local filesystem. It's not good for databases. 
 
-# About AWS EC2 Spot Instances
+This code was in production use for a while at CTC, until we migrated to Elastic Beanstalk. If EB is not a viable choice for your specific application, you may find `ec2-spotter` to be useful. 
 
-EC2 Spot Instances are cheaper than On Demand instances and even Reserved Instances.
+## Basic Architecture
 
-BUT there are several challenges in trying to run a Spot Instance for "normal" Linux-based workloads: 
+It's very simple. You have an application server running as a single-node, On-Demand or Reserved EC2 instance. Once you configure `ec2-spotter`, the base instance will clone itself onto a freshly launched Spot Instance, and will give its Elastic IP Address to the clone. The base instance will then watch the clone. When the clone dies, the base instance will reclaim the Elastic IP Address, then launch a new Spot Instance clone, rinse, repeat.
 
-1. EC2 does not allow specifying an EBS volume as root of a Spot Instance, only an AMI image. 
-2. Every time a Spot Instance is re-launched, a brand new EBS volume is created from the AMI (see point#1), which leads to the creation of a fresh new EBS volume wiped and restored from the AMI. [no longer true as of 9/18/2017]
-3. Spot Instances cannot be Stopped, they can only be Rebooted or Terminated, that exacerbates issue#1 as it means it's impossible to simply reattach your original EBS volume to /dev/xvda. [as of 9/18/2017, Spot Instances can be stopped by AWS, but not the customer]
-4. Important system information stored in /var/log, crontab, apt-get system files, etc, not to mention actual application config and data files, are LOST every time you restart a Spot Instance (directly caused by points #1 and #2 above).
-5. A Spot Instance may be Terminated by AWS at any time, with only a 2-minute warning, whenever the dynamic pricing exceeds your hourly budget.
-6. Essentially, the Spot Instance architecture requires a full redesign of your system to save everything of importance somewhere else (outside of the filesystem), but no Linux distribution exists which does this out of the box. [as of 9/18/2017 this is true only if you need the ability to stop spot instances outside of the AWS-controlled stop event]
+## What's the point of all this?
 
-# Introducing ec2-spotter
+The idea is that you size your base instance a t3.nano Reserved Instance (costs around ~$3/month) and size the Spot Instance to something like a t3.xlarge (normally ~$120/month comes down to $20-$30/month with spot savings). The t3.xlarge becomes your primary server and the t3.nano will step in when the spot price spikes, which is an extremely rare occurrence.   
 
-EC2-Spotter is a utility that brings together the best of both worlds -- Spot Instance pricing with
-the simplicity (persistent EBS filesystem) of On Demand & Reserved Instances. This sounds like cheating, but apparently is not forbidden by the Amazon Terms Of Service.
+## Really? Is that how you run your cloud workloads?
 
-# Running ec2-spotter
+Actually no, I recommend AWS Lambda, ECS, and Elastic Beanstalk for newly developed applications. `ec2-spotter` is more of a niche solution for applications that can't be ported to those modern platforms.
 
-Currently there are two different implementations of the ec2-spotter concept: 'classic' and '24x7'. Both implementations are present in the project, in different sub-directories. The '24x7' implementation works differently from the 'classic' implementation, so check the README in the respective sub-directory for details.
+## Running ec2-spotter 24x7
 
-# How does it work?
+1. Copy `example.conf` to `$(hostname).conf` and modify to your environment.
 
-Each of the implementations works differently, so check the README in the respective sub-directory.
+2. Install prereqs: AWS CLI and jq
 
-# Which one should I use?
+3. Setup two crontab entries on the base machine:
+	
+	`* * * * * [ -f /etc/ec2spotter ] || spot /root/ec2-spotter/example.conf`  
+	
+	`* * * * * [ -f /etc/ec2spotter ] && self-spot /root/ec2-spotter/example.conf`  
 
-- The 'classic' implementation is the one that fully solves the stated problem of root volume persistance, and it should be used for applications that require maximum statefulness but can tolerate occasional down-time, e.g. build servers, experimental or Proof Of Concept enviroments, automated continuous integration, hands-on dev servers, ETL servers, asynchronous processes, batch processing servers in general. Database servers can also be run on 'ec2-spotter classic' as long as they are supporting applications that can tolerate occasional down-time.
-- The '24x7' implementation gives up some of the root volume persistence, in exchange for 24x7 availability. It is for applications that have stateful configuration but create no critical run-time data. This option is adequate for typical Internet-facing web app servers in Production, if your database is remote and you can redirect your application logs to a remote location. It's also ok for caching servers.
+The reason you need two crontab entries is that they will run on both the base (reserved) and the cloned (spot) machines, but need to do something different in each (spot the other instance, or spot itself).
 
-# Notable Forks
+## How does it work?
 
-If you have any issues with the 'classic' implementation, check out Slav Ivanov's fork at https://github.com/slavivanov/ec2-spotter - it is fully productionalized, including more exhaustive documentation and active discussion at his blog, while removing support for the '24x7' concept. 
+A crontab task is setup to run once every minute on the base instance and runs /root/ec2-spotter/spot. This "spot" script watches to ensure the spot instance is always running. 
 
-# Commercial Alternatives
+If a spot instance is not running, 'spot' starts by cloning the base instance (on-demand or reserved) into a Spot Instance. The spot instance takes over the Elastic IP address on successful launch.
 
-ElastiGroup (https://spotinst.com/products/elastigroup/) appears to cover a lot of the same ground as ec2spotter, and more, in a commercial offering. We have no relationship with the company offering ElastiGroup, and have not evaluated their product.
+When the Spot Instance is terminated, the Elastic IP address is reclaimed by the original base instance (again, "spot" script kicks in).
+
+
+
