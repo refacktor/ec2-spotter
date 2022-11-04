@@ -1,0 +1,527 @@
+InstanceType,memory_gb,vcpu,network
+m4.10xlarge,160.0,40,10 Gigabit
+c5.24xlarge,192.0,96,25 Gigabit
+i3.8xlarge,244.0,32,10 Gigabit
+c5a.large,4.0,2,Up to 10 Gigabit
+m6i.16xlarge,256.0,64,25000 Megabit
+m6i.large,8.0,2,Up to 12500 Megabit
+inf1.24xlarge,192.0,96,100 Gigabit
+i3.16xlarge,488.0,64,20 Gigabit
+t2.large,8.0,2,Low to Moderate
+m5ad.large,8.0,2,Up to 10 Gigabit
+r5b.16xlarge,512.0,64,20 Gigabit
+r5ad.2xlarge,64.0,8,Up to 10 Gigabit
+m5dn.8xlarge,128.0,32,25 Gigabit
+c5.4xlarge,32.0,16,Up to 10 Gigabit
+r5n.4xlarge,128.0,16,Up to 25 Gigabit
+c3.8xlarge,60.0,32,10 Gigabit
+r5.16xlarge,512.0,64,20 Gigabit
+r5dn.large,16.0,2,Up to 25 Gigabit
+m6i.24xlarge,384.0,96,37500 Megabit
+m5zn.3xlarge,48.0,12,Up to 25 Gigabit
+i4i.xlarge,32.0,4,Up to 10 Gigabit
+g4ad.4xlarge,64.0,16,Up to 10 Gigabit
+m1.large,7.5,2,Moderate
+r6g.2xlarge,64.0,8,Up to 10 Gigabit
+c5.9xlarge,72.0,36,10 Gigabit
+c5ad.24xlarge,192.0,96,20 Gigabit
+x1e.xlarge,122.0,4,Up to 10 Gigabit
+m5n.24xlarge,384.0,96,100 Gigabit
+r3.8xlarge,244.0,32,10 Gigabit
+r5d.8xlarge,256.0,32,10 Gigabit
+t3.xlarge,16.0,4,Up to 5 Gigabit
+r5d.4xlarge,128.0,16,Up to 10 Gigabit
+r5.4xlarge,128.0,16,Up to 10 Gigabit
+m6g.12xlarge,192.0,48,12 Gigabit
+m6id.large,8.0,2,Up to 12500 Megabit
+m5n.xlarge,16.0,4,Up to 25 Gigabit
+x2iedn.2xlarge,256.0,8,Up to 25 Gigabit
+x1e.8xlarge,976.0,32,Up to 10 Gigabit
+r5d.12xlarge,384.0,48,10 Gigabit
+c5a.8xlarge,64.0,32,10 Gigabit
+m2.4xlarge,68.4,8,High
+r4.2xlarge,61.0,8,Up to 10 Gigabit
+m5zn.2xlarge,32.0,8,Up to 25 Gigabit
+m3.large,7.5,2,Moderate
+c5.12xlarge,96.0,48,12 Gigabit
+c6a.12xlarge,96.0,48,18750 Megabit
+u-12tb1.112xlarge,12288.0,448,100 Gigabit
+r5ad.large,16.0,2,Up to 10 Gigabit
+i2.8xlarge,244.0,32,10 Gigabit
+r3.xlarge,30.5,4,Moderate
+c5a.4xlarge,32.0,16,Up to 10 Gigabit
+i4i.8xlarge,256.0,32,18750 Megabit
+r6i.2xlarge,64.0,8,Up to 12500 Megabit
+r4.xlarge,30.5,4,Up to 10 Gigabit
+r6i.32xlarge,1024.0,128,50000 Megabit
+c5ad.large,4.0,2,Up to 10 Gigabit
+i4i.16xlarge,512.0,64,37500 Megabit
+r4.8xlarge,244.0,32,10 Gigabit
+x2idn.24xlarge,1536.0,96,75 Gigabit
+c5ad.16xlarge,128.0,64,20 Gigabit
+c6a.large,4.0,2,Up to 12500 Megabit
+m5.8xlarge,128.0,32,10 Gigabit
+c5d.4xlarge,32.0,16,Up to 10 Gigabit
+t3.large,8.0,2,Up to 5 Gigabit
+r6g.12xlarge,384.0,48,20 Gigabit
+m5ad.xlarge,16.0,4,Up to 10 Gigabit
+m5d.xlarge,16.0,4,Up to 10 Gigabit
+c5n.18xlarge,192.0,72,100 Gigabit
+m5ad.16xlarge,256.0,64,12 Gigabit
+r5a.12xlarge,384.0,48,10 Gigabit
+c6i.8xlarge,64.0,32,12500 Megabit
+m4.large,8.0,2,Moderate
+r6g.8xlarge,256.0,32,10 Gigabit
+m5dn.24xlarge,384.0,96,100 Gigabit
+m6g.16xlarge,256.0,64,25 Gigabit
+r5.12xlarge,384.0,48,10 Gigabit
+c6gd.16xlarge,128.0,64,25 Gigabit
+m6i.32xlarge,512.0,128,50000 Megabit
+m6i.xlarge,16.0,4,Up to 12500 Megabit
+r6i.24xlarge,768.0,96,37500 Megabit
+i3en.6xlarge,192.0,24,25 Gigabit
+t3.2xlarge,32.0,8,Up to 5 Gigabit
+r5.2xlarge,64.0,8,Up to 10 Gigabit
+r4.large,15.25,2,Up to 10 Gigabit
+r6a.8xlarge,256.0,32,12500 Megabit
+r4.4xlarge,122.0,16,Up to 10 Gigabit
+i3en.xlarge,32.0,4,Up to 25 Gigabit
+c5.18xlarge,144.0,72,25 Gigabit
+x2iedn.24xlarge,3072.0,96,75 Gigabit
+m5d.12xlarge,192.0,48,10 Gigabit
+r5d.16xlarge,512.0,64,20 Gigabit
+m5d.2xlarge,32.0,8,Up to 10 Gigabit
+m5.4xlarge,64.0,16,Up to 10 Gigabit
+m4.xlarge,16.0,4,High
+m1.small,1.7,1,Low
+c6i.24xlarge,192.0,96,37500 Megabit
+r6id.12xlarge,384.0,48,18750 Megabit
+d2.8xlarge,244.0,36,10 Gigabit
+r5.8xlarge,256.0,32,10 Gigabit
+c6g.8xlarge,64.0,32,Up to 10 Gigabit
+r6id.32xlarge,1024.0,128,50000 Megabit
+i3en.3xlarge,96.0,12,Up to 25 Gigabit
+r5d.24xlarge,768.0,96,25 Gigabit
+c6id.4xlarge,32.0,16,Up to 12500 Megabit
+m5d.16xlarge,256.0,64,20 Gigabit
+r5dn.2xlarge,64.0,8,Up to 25 Gigabit
+c5d.9xlarge,72.0,36,10 Gigabit
+r5.24xlarge,768.0,96,25 Gigabit
+m5ad.2xlarge,32.0,8,Up to 10 Gigabit
+d3.8xlarge,256.0,32,25 Gigabit
+x2iezn.8xlarge,1024.0,32,75 Gigabit
+r6id.16xlarge,512.0,64,25000 Megabit
+c5d.18xlarge,144.0,72,25 Gigabit
+m6i.12xlarge,192.0,48,18750 Megabit
+m5.12xlarge,192.0,48,10 Gigabit
+m5.24xlarge,384.0,96,25 Gigabit
+g4dn.2xlarge,32.0,8,Up to 25 Gigabit
+r5ad.12xlarge,384.0,48,10 Gigabit
+r5.xlarge,32.0,4,Up to 10 Gigabit
+m6i.8xlarge,128.0,32,12500 Megabit
+m5d.24xlarge,384.0,96,25 Gigabit
+m6gd.medium,4.0,1,Up to 10 Gigabit
+i3.4xlarge,122.0,16,Up to 10 Gigabit
+m6g.medium,4.0,1,Up to 10 Gigabit
+m5a.2xlarge,32.0,8,Up to 10 Gigabit
+c5n.large,5.25,2,Up to 25 Gigabit
+c5a.xlarge,8.0,4,Up to 10 Gigabit
+r6gd.8xlarge,256.0,32,10 Gigabit
+m6g.large,8.0,2,Up to 10 Gigabit
+m5d.8xlarge,128.0,32,10 Gigabit
+r5d.large,16.0,2,Up to 10 Gigabit
+r5a.24xlarge,768.0,96,20 Gigabit
+i3.2xlarge,61.0,8,Up to 10 Gigabit
+inf1.2xlarge,16.0,8,Up to 25 Gigabit
+r6i.12xlarge,384.0,48,18750 Megabit
+m5d.4xlarge,64.0,16,Up to 10 Gigabit
+d2.2xlarge,61.0,8,High
+m3.xlarge,15.0,4,High
+c6gn.8xlarge,64.0,32,50 Gigabit
+r6a.2xlarge,64.0,8,Up to 12500 Megabit
+m5zn.12xlarge,192.0,48,100 Gigabit
+r5dn.16xlarge,512.0,64,75 Gigabit
+m5zn.xlarge,16.0,4,Up to 25 Gigabit
+z1d.2xlarge,64.0,8,Up to 10 Gigabit
+m6g.2xlarge,32.0,8,Up to 10 Gigabit
+c5.2xlarge,16.0,8,Up to 10 Gigabit
+t3.micro,1.0,2,Up to 5 Gigabit
+r5b.xlarge,32.0,4,Up to 10 Gigabit
+c5d.2xlarge,16.0,8,Up to 10 Gigabit
+c5n.xlarge,10.5,4,Up to 25 Gigabit
+r5ad.24xlarge,768.0,96,20 Gigabit
+r6i.16xlarge,512.0,64,25000 Megabit
+g5.2xlarge,32.0,8,Up to 10 Gigabit
+r5b.4xlarge,128.0,16,Up to 10 Gigabit
+r5b.2xlarge,64.0,8,Up to 10 Gigabit
+x1.16xlarge,976.0,64,High
+c6a.xlarge,8.0,4,Up to 12500 Megabit
+i4i.2xlarge,64.0,8,Up to 12 Gigabit
+p3.16xlarge,488.0,64,25 Gigabit
+m5a.12xlarge,192.0,48,10 Gigabit
+c6i.12xlarge,96.0,48,18750 Megabit
+i3en.large,16.0,2,Up to 25 Gigabit
+z1d.12xlarge,384.0,48,25 Gigabit
+r5a.xlarge,32.0,4,Up to 10 Gigabit
+c6i.32xlarge,256.0,128,50000 Megabit
+i3.xlarge,30.5,4,Up to 10 Gigabit
+u-6tb1.56xlarge,6144.0,224,100 Gigabit
+m5.2xlarge,32.0,8,Up to 10 Gigabit
+z1d.xlarge,32.0,4,Up to 10 Gigabit
+r5n.large,16.0,2,Up to 25 Gigabit
+c6g.medium,2.0,1,Up to 10 Gigabit
+c6i.xlarge,8.0,4,Up to 12500 Megabit
+m3.medium,3.75,1,Moderate
+m6i.4xlarge,64.0,16,Up to 12500 Megabit
+f1.2xlarge,122.0,8,Up to 10 Gigabit
+t2.xlarge,16.0,4,Moderate
+i3en.2xlarge,64.0,8,Up to 25 Gigabit
+r5b.12xlarge,384.0,48,10 Gigabit
+m4.2xlarge,32.0,8,High
+g5.24xlarge,384.0,96,50 Gigabit
+i2.2xlarge,61.0,8,High
+t3a.xlarge,16.0,4,Up to 5 Gigabit
+m5ad.12xlarge,192.0,48,10 Gigabit
+m6a.2xlarge,32.0,8,Up to 12500 Megabit
+r6g.large,16.0,2,Up to 10 Gigabit
+m5dn.12xlarge,192.0,48,50 Gigabit
+r3.2xlarge,61.0,8,High
+c6a.24xlarge,192.0,96,37500 Megabit
+m6gd.16xlarge,256.0,64,25 Gigabit
+c5n.2xlarge,21.0,8,Up to 25 Gigabit
+c3.large,3.75,2,Moderate
+h1.8xlarge,128.0,32,10 Gigabit
+p2.16xlarge,732.0,64,20 Gigabit
+r5dn.8xlarge,256.0,32,25 Gigabit
+c6a.8xlarge,64.0,32,12500 Megabit
+r5a.large,16.0,2,Up to 10 Gigabit
+m6id.8xlarge,128.0,32,12500 Megabit
+inf1.6xlarge,48.0,24,25 Gigabit
+p4d.24xlarge,1152.0,96,400 Gigabit
+m4.4xlarge,64.0,16,High
+m5n.16xlarge,256.0,64,75 Gigabit
+c5d.large,4.0,2,Up to 10 Gigabit
+c6i.4xlarge,32.0,16,Up to 12500 Megabit
+i3en.24xlarge,768.0,96,100 Gigabit
+r5d.xlarge,32.0,4,Up to 10 Gigabit
+r6i.8xlarge,256.0,32,12500 Megabit
+x2idn.16xlarge,1024.0,64,50 Gigabit
+x1e.2xlarge,244.0,8,Up to 10 Gigabit
+m5.xlarge,16.0,4,Up to 10 Gigabit
+m3.2xlarge,30.0,8,High
+c5d.12xlarge,96.0,48,12 Gigabit
+r5ad.8xlarge,256.0,32,Up to 10 Gigabit
+x1e.16xlarge,1952.0,64,10 Gigabit
+t3a.2xlarge,32.0,8,Up to 5 Gigabit
+r5ad.xlarge,32.0,4,Up to 10 Gigabit
+x1e.4xlarge,488.0,16,Up to 10 Gigabit
+i2.xlarge,30.5,4,Moderate
+x2iedn.32xlarge,4096.0,128,100 Gigabit
+x2iedn.xlarge,128.0,4,Up to 25 Gigabit
+x2iezn.6xlarge,768.0,24,50 Gigabit
+m6a.24xlarge,384.0,96,37500 Megabit
+t4g.micro,1.0,2,Up to 5 Gigabit
+r6i.large,16.0,2,Up to 12500 Megabit
+c7g.16xlarge,128.0,64,30 Gigabit
+r5n.2xlarge,64.0,8,Up to 25 Gigabit
+r6id.2xlarge,64.0,8,Up to 12500 Megabit
+r5d.2xlarge,64.0,8,Up to 10 Gigabit
+m6i.2xlarge,32.0,8,Up to 12500 Megabit
+c5a.24xlarge,192.0,96,20 Gigabit
+g4dn.xlarge,16.0,4,Up to 25 Gigabit
+c6id.24xlarge,192.0,96,37500 Megabit
+m6gd.8xlarge,128.0,32,10 Gigabit
+u-9tb1.112xlarge,9216.0,448,100 Gigabit
+r5dn.xlarge,32.0,4,Up to 25 Gigabit
+c7g.xlarge,8.0,4,Up to 12500 Megabit
+c5.xlarge,8.0,4,Up to 10 Gigabit
+r5n.8xlarge,256.0,32,25 Gigabit
+m5a.large,8.0,2,Up to 10 Gigabit
+g5.12xlarge,192.0,48,40 Gigabit
+c6id.large,4.0,2,Up to 12500 Megabit
+r6id.xlarge,32.0,4,Up to 12500 Megabit
+m5a.xlarge,16.0,4,Up to 10 Gigabit
+x2idn.32xlarge,2048.0,128,100 Gigabit
+r6a.16xlarge,512.0,64,25000 Megabit
+r5a.8xlarge,256.0,32,Up to 10 Gigabit
+c4.large,3.75,2,Moderate
+d2.xlarge,30.5,4,Moderate
+c5a.12xlarge,96.0,48,12 Gigabit
+c3.2xlarge,15.0,8,High
+c4.xlarge,7.5,4,High
+r5a.4xlarge,128.0,16,Up to 10 Gigabit
+i3en.12xlarge,384.0,48,50 Gigabit
+m5ad.8xlarge,128.0,32,Up to 10 Gigabit
+m5dn.4xlarge,64.0,16,Up to 25 Gigabit
+r6a.large,16.0,2,Up to 12500 Megabit
+c6gn.medium,2.0,1,Up to 25 Gigabit
+r5n.16xlarge,512.0,64,75 Gigabit
+inf1.xlarge,8.0,4,Up to 25 Gigabit
+r5a.16xlarge,512.0,64,12 Gigabit
+c6g.xlarge,8.0,4,Up to 10 Gigabit
+m5a.4xlarge,64.0,16,Up to 10 Gigabit
+c6g.16xlarge,128.0,64,25 Gigabit
+m5n.4xlarge,64.0,16,Up to 25 Gigabit
+d3.4xlarge,128.0,16,Up to 15 Gigabit
+t3.medium,4.0,2,Up to 5 Gigabit
+c3.xlarge,7.5,4,Moderate
+r4.16xlarge,488.0,64,20 Gigabit
+x1.32xlarge,1952.0,128,High
+r5b.8xlarge,256.0,32,10 Gigabit
+p2.xlarge,61.0,4,High
+r5a.2xlarge,64.0,8,Up to 10 Gigabit
+c6id.2xlarge,16.0,8,Up to 12500 Megabit
+c6gn.large,4.0,2,Up to 25 Gigabit
+r5n.12xlarge,384.0,48,50 Gigabit
+i3.large,15.25,2,Up to 10 Gigabit
+r6i.xlarge,32.0,4,Up to 12500 Megabit
+m6a.4xlarge,64.0,16,Up to 12500 Megabit
+r5n.24xlarge,768.0,96,100 Gigabit
+c6gd.4xlarge,32.0,16,Up to 10 Gigabit
+x1e.32xlarge,3904.0,128,25 Gigabit
+c4.4xlarge,30.0,16,High
+c6id.xlarge,8.0,4,Up to 12500 Megabit
+r6a.24xlarge,768.0,96,37500 Megabit
+m5zn.large,8.0,2,Up to 25 Gigabit
+g4dn.8xlarge,128.0,32,50 Gigabit
+c5d.xlarge,8.0,4,Up to 10 Gigabit
+i4i.4xlarge,128.0,16,Up to 25 Gigabit
+x2iezn.2xlarge,256.0,8,Up to 25 Gigabit
+c5n.9xlarge,96.0,36,50 Gigabit
+r5n.xlarge,32.0,4,Up to 25 Gigabit
+c6id.32xlarge,256.0,128,50000 Megabit
+r6gd.12xlarge,384.0,48,20 Gigabit
+m5ad.4xlarge,64.0,16,Up to 10 Gigabit
+x2iezn.12xlarge,1536.0,48,100 Gigabit
+c6i.large,4.0,2,Up to 12500 Megabit
+r6i.4xlarge,128.0,16,Up to 12500 Megabit
+c6gd.8xlarge,64.0,32,10 Gigabit
+p2.8xlarge,488.0,32,10 Gigabit
+c5a.16xlarge,128.0,64,20 Gigabit
+t4g.small,2.0,2,Up to 5 Gigabit
+g3.16xlarge,488.0,64,20 Gigabit
+m5dn.16xlarge,256.0,64,75 Gigabit
+m6id.xlarge,16.0,4,Up to 12500 Megabit
+c5d.24xlarge,192.0,96,25 Gigabit
+m6gd.12xlarge,192.0,48,20 Gigabit
+m5a.24xlarge,384.0,96,20 Gigabit
+r5b.24xlarge,768.0,96,25 Gigabit
+im4gn.2xlarge,32.0,8,Up to 25 Gigabit
+d2.4xlarge,122.0,16,High
+m5d.large,8.0,2,Up to 10 Gigabit
+x2iedn.4xlarge,512.0,16,Up to 25 Gigabit
+t4g.xlarge,16.0,4,Up to 5 Gigabit
+t4g.large,8.0,2,Up to 5 Gigabit
+m6a.xlarge,16.0,4,Up to 12500 Megabit
+t3.small,2.0,2,Up to 5 Gigabit
+r5ad.4xlarge,128.0,16,Up to 10 Gigabit
+m5a.8xlarge,128.0,32,Up to 10 Gigabit
+m6id.2xlarge,32.0,8,Up to 12500 Megabit
+m6gd.2xlarge,32.0,8,Up to 10 Gigabit
+a1.2xlarge,16.0,8,Up to 10 Gigabit
+c7g.2xlarge,16.0,8,Up to 15 Gigabit
+m5n.8xlarge,128.0,32,25 Gigabit
+c6gn.12xlarge,96.0,48,75 Gigabit
+c6id.8xlarge,64.0,32,12500 Megabit
+t3a.large,8.0,2,Up to 5 Gigabit
+i2.4xlarge,122.0,16,High
+m6a.8xlarge,128.0,32,12500 Megabit
+t2.small,2.0,1,Low to Moderate
+i4i.large,16.0,2,Up to 10 Gigabit
+m6id.16xlarge,256.0,64,25000 Megabit
+g5.xlarge,16.0,4,Up to 10 Gigabit
+i4i.32xlarge,1024.0,128,75000 Megabit
+r6a.12xlarge,384.0,48,18750 Megabit
+c6i.16xlarge,128.0,64,25000 Megabit
+r5dn.24xlarge,768.0,96,100 Gigabit
+a1.4xlarge,32.0,16,Up to 10 Gigabit
+t2.micro,1.0,1,Low to Moderate
+m5a.16xlarge,256.0,64,12 Gigabit
+m5zn.6xlarge,96.0,24,50 Gigabit
+m6a.48xlarge,768.0,192,50000 Megabit
+c5ad.2xlarge,16.0,8,Up to 10 Gigabit
+c7g.large,4.0,2,Up to 12500 Megabit
+c6gd.xlarge,8.0,4,Up to 10 Gigabit
+m6id.24xlarge,384.0,96,37500 Megabit
+r6g.xlarge,32.0,4,Up to 10 Gigabit
+r5.large,16.0,2,Up to 10 Gigabit
+u-3tb1.56xlarge,3072.0,224,50 Gigabit
+m5dn.2xlarge,32.0,8,Up to 25 Gigabit
+x2iedn.8xlarge,1024.0,32,25 Gigabit
+c6gd.12xlarge,96.0,48,20 Gigabit
+im4gn.4xlarge,64.0,16,25 Gigabit
+r5dn.12xlarge,384.0,48,50 Gigabit
+c3.4xlarge,30.0,16,High
+m5.16xlarge,256.0,64,20 Gigabit
+g4dn.12xlarge,192.0,48,50 Gigabit
+c6id.16xlarge,128.0,64,25000 Megabit
+r3.4xlarge,122.0,16,High
+c4.2xlarge,15.0,8,High
+m5.large,8.0,2,Up to 10 Gigabit
+c5a.2xlarge,16.0,8,Up to 10 Gigabit
+r3.large,15.25,2,Moderate
+r6gd.medium,8.0,1,Up to 10 Gigabit
+r5dn.4xlarge,128.0,16,Up to 25 Gigabit
+m6g.8xlarge,128.0,32,10 Gigabit
+x2iedn.16xlarge,2048.0,64,50 Gigabit
+p3dn.24xlarge,768.0,96,100 Gigabit
+m5n.2xlarge,32.0,8,Up to 25 Gigabit
+c6a.16xlarge,128.0,64,25000 Megabit
+c5.large,4.0,2,Up to 10 Gigabit
+c4.8xlarge,60.0,36,10 Gigabit
+r6g.16xlarge,512.0,64,25 Gigabit
+h1.4xlarge,64.0,16,Up to 10 Gigabit
+d3.xlarge,32.0,4,Up to 15 Gigabit
+m6a.32xlarge,512.0,128,50000 Megabit
+c6i.2xlarge,16.0,8,Up to 12500 Megabit
+d3en.2xlarge,32.0,8,Up to 25 Gigabit
+m6id.4xlarge,64.0,16,Up to 12500 Megabit
+g5.8xlarge,128.0,32,25 Gigabit
+g4dn.4xlarge,64.0,16,Up to 25 Gigabit
+m4.16xlarge,256.0,64,20 Gigabit
+t4g.medium,4.0,2,Up to 5 Gigabit
+r6g.medium,8.0,1,Up to 10 Gigabit
+c6g.4xlarge,32.0,16,Up to 10 Gigabit
+m6id.12xlarge,192.0,48,18750 Megabit
+c6gd.medium,2.0,1,Up to 10 Gigabit
+r6gd.xlarge,32.0,4,Up to 10 Gigabit
+g4dn.16xlarge,256.0,64,50 Gigabit
+d3en.12xlarge,192.0,48,75 Gigabit
+c6a.4xlarge,32.0,16,Up to 12500 Megabit
+r6a.4xlarge,128.0,16,Up to 12500 Megabit
+c6gn.4xlarge,32.0,16,25 Gigabit
+z1d.3xlarge,96.0,12,Up to 10 Gigabit
+c6g.2xlarge,16.0,8,Up to 10 Gigabit
+hs1.8xlarge,117.0,16,10 Gigabit
+m5ad.24xlarge,384.0,96,20 Gigabit
+m6a.large,8.0,2,Up to 12500 Megabit
+h1.16xlarge,256.0,64,25 Gigabit
+d3en.xlarge,16.0,4,Up to 25 Gigabit
+c5ad.4xlarge,32.0,16,Up to 10 Gigabit
+r6id.8xlarge,256.0,32,12500 Megabit
+vt1.6xlarge,48.0,24,6250 Megabit
+r6a.48xlarge,1536.0,192,50000 Megabit
+c5n.4xlarge,42.0,16,Up to 25 Gigabit
+u-6tb1.112xlarge,6144.0,448,100 Gigabit
+r6id.4xlarge,128.0,16,Up to 12500 Megabit
+g5g.2xlarge,16.0,8,Up to 10 Gigabit
+g5.48xlarge,768.0,192,100 Gigabit
+t4g.nano,0.5,2,Up to 5 Gigabit
+c5ad.xlarge,8.0,4,Up to 10 Gigabit
+r6a.32xlarge,1024.0,128,50000 Megabit
+m5dn.large,8.0,2,Up to 25 Gigabit
+h1.2xlarge,32.0,8,Up to 10 Gigabit
+m5n.12xlarge,192.0,48,50 Gigabit
+r6gd.large,16.0,2,Up to 10 Gigabit
+c6gd.2xlarge,16.0,8,Up to 10 Gigabit
+t3a.nano,0.5,2,Up to 5 Gigabit
+m6gd.4xlarge,64.0,16,Up to 10 Gigabit
+g3.8xlarge,244.0,32,10 Gigabit
+m6g.4xlarge,64.0,16,Up to 10 Gigabit
+p3.8xlarge,244.0,32,10 Gigabit
+c6a.32xlarge,256.0,128,50000 Megabit
+z1d.6xlarge,192.0,24,10 Gigabit
+f1.16xlarge,976.0,64,25 Gigabit
+c6gn.2xlarge,16.0,8,Up to 25 Gigabit
+c6g.12xlarge,96.0,48,20 Gigabit
+r6id.large,16.0,2,Up to 12500 Megabit
+f1.4xlarge,244.0,16,10 Gigabit
+m6gd.large,8.0,2,Up to 10 Gigabit
+r6id.24xlarge,768.0,96,37500 Megabit
+t2.medium,4.0,2,Low to Moderate
+d3en.6xlarge,96.0,24,40 Gigabit
+t3a.medium,4.0,2,Up to 5 Gigabit
+c6a.2xlarge,16.0,8,Up to 12500 Megabit
+g3.4xlarge,122.0,16,Up to 10 Gigabit
+c6gn.xlarge,8.0,4,Up to 25 Gigabit
+c7g.12xlarge,96.0,48,22500 Megabit
+d3en.8xlarge,128.0,32,50 Gigabit
+u-18tb1.112xlarge,18432.0,448,100 Gigabit
+c5ad.8xlarge,64.0,32,10 Gigabit
+c7g.4xlarge,32.0,16,Up to 15 Gigabit
+d3.2xlarge,64.0,8,Up to 15 Gigabit
+is4gen.xlarge,24.0,4,Up to 25 Gigabit
+r6gd.4xlarge,128.0,16,Up to 10 Gigabit
+m6g.xlarge,16.0,4,Up to 10 Gigabit
+r6gd.16xlarge,512.0,64,25 Gigabit
+vt1.24xlarge,192.0,96,25000 Megabit
+t3.nano,0.5,2,Up to 5 Gigabit
+m6a.12xlarge,192.0,48,18750 Megabit
+x2gd.2xlarge,128.0,8,Up to 10 Gigabit
+p3.2xlarge,61.0,8,Up to 10 Gigabit
+c6gn.16xlarge,128.0,64,100 Gigabit
+c5ad.12xlarge,96.0,48,12 Gigabit
+g3s.xlarge,30.5,4,10 Gigabit
+g4ad.xlarge,16.0,4,Up to 10 Gigabit
+is4gen.medium,6.0,1,Up to 25 Gigabit
+m1.xlarge,15.0,4,High
+c6gd.large,4.0,2,Up to 10 Gigabit
+m5dn.xlarge,16.0,4,Up to 25 Gigabit
+m5n.large,8.0,2,Up to 25 Gigabit
+im4gn.large,8.0,2,Up to 25 Gigabit
+g2.8xlarge,60.0,32,High
+r6g.4xlarge,128.0,16,Up to 10 Gigabit
+r5ad.16xlarge,512.0,64,12 Gigabit
+m6a.16xlarge,256.0,64,25000 Megabit
+a1.large,4.0,2,Up to 10 Gigabit
+c6g.large,4.0,2,Up to 10 Gigabit
+g5.4xlarge,64.0,16,Up to 25 Gigabit
+hpc6a.48xlarge,384.0,96,100 Gigabit
+z1d.large,16.0,2,Up to 10 Gigabit
+r6a.xlarge,32.0,4,Up to 12500 Megabit
+g4ad.8xlarge,128.0,32,15 Gigabit
+t3a.small,2.0,2,Up to 5 Gigabit
+g2.2xlarge,15.0,8,Moderate
+g5g.16xlarge,128.0,64,25 Gigabit
+m6gd.xlarge,16.0,4,Up to 10 Gigabit
+x2iezn.4xlarge,512.0,16,Up to 25 Gigabit
+r5b.large,16.0,2,Up to 10 Gigabit
+c6id.12xlarge,96.0,48,18750 Megabit
+a1.medium,2.0,1,Up to 10 Gigabit
+t2.2xlarge,32.0,8,Moderate
+u-24tb1.112xlarge,24576.0,448,100 Gigabit
+x2gd.16xlarge,1024.0,64,25 Gigabit
+t4g.2xlarge,32.0,8,Up to 5 Gigabit
+m6id.32xlarge,512.0,128,50000 Megabit
+c6a.48xlarge,384.0,192,50000 Megabit
+is4gen.2xlarge,48.0,8,Up to 25 Gigabit
+c7g.medium,2.0,1,Up to 12500 Megabit
+im4gn.xlarge,16.0,4,Up to 25 Gigabit
+a1.xlarge,8.0,4,Up to 10 Gigabit
+t3a.micro,1.0,2,Up to 5 Gigabit
+im4gn.8xlarge,128.0,32,50 Gigabit
+r6gd.2xlarge,64.0,8,Up to 10 Gigabit
+g5.16xlarge,256.0,64,25 Gigabit
+trn1.2xlarge,32.0,8,12500 Megabit
+g5g.4xlarge,32.0,16,Up to 10 Gigabit
+is4gen.4xlarge,96.0,16,25 Gigabit
+is4gen.8xlarge,192.0,32,50 Gigabit
+c7g.8xlarge,64.0,32,15 Gigabit
+c1.medium,1.7,2,Moderate
+x2gd.medium,16.0,1,Up to 10 Gigabit
+g4ad.16xlarge,256.0,64,25 Gigabit
+g4ad.2xlarge,32.0,8,Up to 10 Gigabit
+im4gn.16xlarge,256.0,64,100 Gigabit
+d3en.4xlarge,64.0,16,25 Gigabit
+m2.xlarge,17.1,2,Moderate
+x2gd.large,32.0,2,Up to 10 Gigabit
+is4gen.large,12.0,2,Up to 25 Gigabit
+i3p.16xlarge,488.0,64,20 Gigabit
+x2gd.12xlarge,768.0,48,20 Gigabit
+g5g.xlarge,8.0,4,Up to 10 Gigabit
+x2gd.4xlarge,256.0,16,Up to 10 Gigabit
+c1.xlarge,7.0,8,High
+x2gd.8xlarge,512.0,32,12 Gigabit
+p4de.24xlarge,1152.0,96,400 Gigabit
+vt1.3xlarge,24.0,12,3125 Megabit
+cc2.8xlarge,60.5,32,10 Gigabit
+g5g.8xlarge,64.0,32,Up to 12 Gigabit
+t2.nano,0.5,1,Low
+dl1.24xlarge,768.0,96,400 Gigabit
+t1.micro,0.613,1,Very Low
+x2gd.xlarge,64.0,4,Up to 10 Gigabit
+trn1.32xlarge,512.0,128,800 Gigabit
+cr1.8xlarge,244.0,32,10 Gigabit
+m2.2xlarge,34.2,4,Moderate
+m1.medium,3.75,1,Moderate
+i2.large,15.0,2,Moderate
